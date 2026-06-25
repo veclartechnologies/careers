@@ -931,7 +931,7 @@ async function submitForm(){
       resume:{ filename: resumeFile.name, mimeType: resumeFile.type || "application/octet-stream", data: resumeB64 }
     };
 
-    const scriptUrl = "<?= webAppUrl ?>";
+    const scriptUrl = "https://script.google.com/macros/s/AKfycbz4zbvd9NW_3ar9e9qVtha_gpFZMcZbT69F7w0kWzbssz118pkgC7JykA3DNgJlGw64FQ/exec";
     if(!scriptUrl || scriptUrl.includes("REPLACE")){
       console.warn("APPS_SCRIPT_URL not set — showing success without remote submit.");
     } else {
