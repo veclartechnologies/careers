@@ -608,7 +608,7 @@
 
 <script>
 /* ================== CONFIG ================== */
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwBTUGAzQeothThArXSzWk30fy0j3CiNUAx9i00RwXcNZ6LEI7BpM96yzBOL5e6RxPy/exec";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx4alBroXvEldJTSIEYpLtQ0-7d0oLyWq_qKxTDB4DQpwd3TTzjt7W0N2k0Du4xTN7V/exec";
 const TOTAL_VISIBLE_STEPS = 5;
 const STEP_NAMES = ["Personal Information","Academic Information","Voice Introduction","Script Recording","Resume Upload","Submitted"];
 const COOLDOWN_SEC = 120; // 2 minutes
@@ -1392,7 +1392,7 @@ async function submitForm(){
       resume:{ filename: resumeName, mimeType: resumeType, data: resumeB64 }
     };
 
-    const scriptUrl = "https://script.google.com/macros/s/AKfycbwBTUGAzQeothThArXSzWk30fy0j3CiNUAx9i00RwXcNZ6LEI7BpM96yzBOL5e6RxPy/exec";
+    const scriptUrl = "https://script.google.com/macros/s/AKfycbx4alBroXvEldJTSIEYpLtQ0-7d0oLyWq_qKxTDB4DQpwd3TTzjt7W0N2k0Du4xTN7V/exec";
     if(!scriptUrl || scriptUrl.includes("REPLACE")){
       console.warn("APPS_SCRIPT_URL not set — showing success without remote submit.");
     } else {
