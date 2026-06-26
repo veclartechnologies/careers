@@ -72,12 +72,18 @@
   }
   @keyframes plSlide{0%{left:-40%}100%{left:100%}}
 
-  /* Header */
+  /* Header — amendment (a): fade on scroll */
   .topbar{
     position:sticky;top:0;z-index:10;
     background:transparent;
     border-bottom:none;
     padding:14px 20px 12px;
+    transition:opacity .25s ease, visibility .25s ease;
+  }
+  .topbar.header-hidden{
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
   }
   .brand{display:flex;align-items:center;gap:10px}
   .brand-logo{
@@ -280,6 +286,19 @@
   .file-pill .size{font-size:11px;color:var(--muted)}
   .file-pill button{background:transparent;border:none;color:var(--danger);cursor:pointer;font-size:18px}
 
+  /* Pre-upload status badge */
+  .upload-status{
+    display:inline-flex;align-items:center;gap:6px;
+    font-size:11px;margin-top:6px;padding:4px 10px;border-radius:6px;
+  }
+  .upload-status.uploading{color:var(--gold);background:var(--gold-soft)}
+  .upload-status.uploaded{color:var(--success);background:rgba(61,220,132,.1)}
+  .upload-status.failed{color:var(--danger);background:rgba(255,91,107,.1)}
+  .upload-status .mini-spinner{
+    width:12px;height:12px;border:2px solid rgba(245,192,68,.3);border-top-color:var(--gold);
+    border-radius:50%;animation:spin .8s linear infinite;display:inline-block;
+  }
+
   /* Success */
   .success-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:60px 20px;min-height:70vh}
   .success-icon{
@@ -319,7 +338,20 @@
     background:var(--panel-2);border:1px solid var(--border);border-radius:18px;
     padding:32px 28px;text-align:center;max-width:340px;width:90%;
     box-shadow:0 20px 60px rgba(0,0,0,.6);
+    position:relative;
   }
+  /* Amendment (b): Close X button */
+  .modal-close-btn{
+    position:absolute;top:12px;right:12px;
+    width:32px;height:32px;border-radius:50%;
+    background:rgba(255,255,255,.06);border:1px solid var(--border);
+    color:var(--muted);cursor:pointer;
+    display:grid;place-items:center;
+    transition:.2s;
+    font-size:0;line-height:0;
+  }
+  .modal-close-btn:hover{background:rgba(255,255,255,.12);color:var(--text)}
+  .modal-close-btn svg{width:16px;height:16px}
   .modal-icon{
     width:64px;height:64px;border-radius:50%;
     background:rgba(255,91,107,.12);border:2px solid var(--danger);
@@ -343,9 +375,14 @@
     <img class="pl-logo" src="https://raw.githubusercontent.com/veclartechnologies/careers/refs/heads/main/veclar%20logo%20for%20dark.png" alt="Veclar Technologies">
 </div>
 
-<!-- ATTEMPT LIMIT MODAL -->
+<!-- ATTEMPT LIMIT MODAL — amendment (b): added close X button -->
 <div class="modal-backdrop" id="attemptModal">
   <div class="modal-box">
+    <button class="modal-close-btn" id="modalCloseBtn" type="button" aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
     <div class="modal-icon">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
@@ -359,7 +396,7 @@
 </div>
 
 <div class="app">
-  <header class="topbar">
+  <header class="topbar" id="topbar">
     <div class="brand">
       <img class="brand-logo" src="https://raw.githubusercontent.com/onyx-hr/nexus/refs/heads/main/fav.png" alt="Veclar Technologies">
       <div>
@@ -478,6 +515,7 @@
         <button class="stop-btn" id="introStop" type="button" disabled>Stop &amp; Discard</button>
         <div class="silence-warn" id="introSilence">⚠️ We can't hear you — please speak now</div>
         <div class="audio-preview" id="introPreview"></div>
+        <div id="introUploadStatus"></div>
       </div>
       <div class="instructions">
         <h4>What to say</h4>
@@ -512,6 +550,7 @@
             <div class="attempts">Discards left: <b id="scriptAttempts">2</b>/2</div>
             <div class="silence-warn" id="scriptSilence">⚠️ Speak up — timer running</div>
             <div class="audio-preview" id="scriptPreview"></div>
+            <div id="scriptUploadStatus"></div>
           </div>
           <div class="instructions" id="step4Instructions">
             <h4>Instructions</h4>
@@ -539,6 +578,7 @@
         <input id="resumeInput" type="file" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" hidden />
       </label>
       <div id="resumePill"></div>
+      <div id="resumeUploadStatus"></div>
       <div class="err-msg" id="err-resume"></div>
     </section>
 
@@ -578,8 +618,6 @@ const AREAS = {
 };
 
 /* ================== SESSION PERSISTENCE ================== */
-// We store form state in sessionStorage so reloads restore position.
-// sessionStorage is cleared when the tab/browser is closed (session ends).
 const SS_KEY = "veclar_form_state";
 
 function saveState(){
@@ -600,7 +638,6 @@ function saveState(){
     scriptStopLocked: scriptStopLocked,
     scriptStartCount: scriptStartCount,
     cooldownEnd: cooldownEnd,
-    // blobs cannot be serialized — they require re-recording if page reloads mid-step
     hasIntroBlob: !!introBlob,
     hasScriptBlob: !!scriptBlob,
     resumeName: resumeFile ? resumeFile.name : null,
@@ -627,8 +664,14 @@ let resumeFile = null;
 let scriptAttempts = 2;
 let scriptStopLocked = false;
 let scriptStartCount = 0;
-let cooldownEnd = 0; // timestamp ms when cooldown ends (0 = no cooldown)
+let cooldownEnd = 0;
 let cooldownTimer = null;
+
+/* Amendment (c): Pre-upload state — base64 results stored here once ready */
+let preUploadedIntroB64 = null;
+let preUploadedScriptB64 = null;
+let preUploadedResumeB64 = null;
+let preUploadedResumeMeta = null; // {name, type}
 
 const $ = id => document.getElementById(id);
 
@@ -642,6 +685,23 @@ const fmtTime = s => `${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60)
 const fileSize = b => b<1024?b+" B":b<1048576?(b/1024).toFixed(1)+" KB":(b/1048576).toFixed(2)+" MB";
 const sanitize = s => (s||"Candidate").trim().replace(/[^a-zA-Z0-9]/g,"_") || "Candidate";
 
+/* ===== Amendment (a): Header scroll hide ===== */
+(function(){
+  let lastY = 0;
+  const THRESHOLD = 10; // pixels of scroll before hiding
+  window.addEventListener("scroll", function(){
+    const tb = $("topbar");
+    if(!tb) return;
+    const y = window.scrollY || window.pageYOffset;
+    if(y > THRESHOLD){
+      tb.classList.add("header-hidden");
+    } else {
+      tb.classList.remove("header-hidden");
+    }
+    lastY = y;
+  }, {passive:true});
+})();
+
 /* ===== Preloader ===== */
 window.addEventListener("load", ()=>{
   setTimeout(()=>{
@@ -650,7 +710,7 @@ window.addEventListener("load", ()=>{
   }, 1100);
 });
 
-/* ===== Attempt Limit Modal ===== */
+/* ===== Attempt Limit Modal — amendment (b): close button ===== */
 function showAttemptModal(){
   $("attemptModal").classList.add("show");
   runCooldownDisplay();
@@ -658,6 +718,17 @@ function showAttemptModal(){
 function hideAttemptModal(){
   $("attemptModal").classList.remove("show");
 }
+
+// Close X button handler
+document.addEventListener("DOMContentLoaded", ()=>{
+  const closeBtn = $("modalCloseBtn");
+  if(closeBtn){
+    closeBtn.addEventListener("click", ()=>{
+      hideAttemptModal();
+    });
+  }
+});
+
 function runCooldownDisplay(){
   if(cooldownTimer) clearInterval(cooldownTimer);
   const tick = ()=>{
@@ -668,10 +739,8 @@ function runCooldownDisplay(){
       cooldownTimer = null;
       cooldownEnd = 0;
       hideAttemptModal();
-      // Re-enable the mic button after cooldown
       const mic = $("scriptMic");
       if(mic) mic.disabled = false;
-      // Reset attempt counter for a fresh set of attempts
       scriptAttempts = 2;
       scriptStartCount = 0;
       scriptStopLocked = false;
@@ -687,11 +756,75 @@ function runCooldownDisplay(){
 
 function triggerCooldown(){
   cooldownEnd = Date.now() + COOLDOWN_SEC * 1000;
-  // Disable the mic button
   const mic = $("scriptMic");
   if(mic) mic.disabled = true;
   saveState();
   showAttemptModal();
+}
+
+/* ===== Amendment (c): Pre-upload helpers ===== */
+function blobToBase64(blob){
+  return new Promise((res,rej)=>{
+    const r=new FileReader();
+    r.onload=()=>res(r.result.split(",")[1]);
+    r.onerror=rej;
+    r.readAsDataURL(blob);
+  });
+}
+
+function setUploadStatusHTML(containerId, status, label){
+  const el = $(containerId);
+  if(!el) return;
+  if(status === "uploading"){
+    el.innerHTML = '<div class="upload-status uploading"><span class="mini-spinner"></span> ' + label + '</div>';
+  } else if(status === "uploaded"){
+    el.innerHTML = '<div class="upload-status uploaded">✓ ' + label + '</div>';
+  } else if(status === "failed"){
+    el.innerHTML = '<div class="upload-status failed">✗ ' + label + '</div>';
+  } else {
+    el.innerHTML = '';
+  }
+}
+
+async function preUploadIntro(blob){
+  setUploadStatusHTML("introUploadStatus", "uploading", "Pre-encoding audio…");
+  try{
+    preUploadedIntroB64 = await blobToBase64(blob);
+    setUploadStatusHTML("introUploadStatus", "uploaded", "Audio ready for submission");
+  }catch(e){
+    console.error("Pre-upload intro failed", e);
+    preUploadedIntroB64 = null;
+    setUploadStatusHTML("introUploadStatus", "failed", "Encoding failed — will retry on submit");
+  }
+}
+
+async function preUploadScript(blob){
+  setUploadStatusHTML("scriptUploadStatus", "uploading", "Pre-encoding audio…");
+  try{
+    preUploadedScriptB64 = await blobToBase64(blob);
+    setUploadStatusHTML("scriptUploadStatus", "uploaded", "Audio ready for submission");
+  }catch(e){
+    console.error("Pre-upload script failed", e);
+    preUploadedScriptB64 = null;
+    setUploadStatusHTML("scriptUploadStatus", "failed", "Encoding failed — will retry on submit");
+  }
+}
+
+async function preUploadResume(file){
+  setUploadStatusHTML("resumeUploadStatus", "uploading", "Pre-encoding resume…");
+  try{
+    const b64 = await new Promise((res,rej)=>{
+      const r=new FileReader(); r.onload=()=>res(r.result.split(",")[1]); r.onerror=rej; r.readAsDataURL(file);
+    });
+    preUploadedResumeB64 = b64;
+    preUploadedResumeMeta = { name: file.name, type: file.type || "application/octet-stream" };
+    setUploadStatusHTML("resumeUploadStatus", "uploaded", "Resume ready for submission");
+  }catch(e){
+    console.error("Pre-upload resume failed", e);
+    preUploadedResumeB64 = null;
+    preUploadedResumeMeta = null;
+    setUploadStatusHTML("resumeUploadStatus", "failed", "Encoding failed — will retry on submit");
+  }
 }
 
 function init(){
@@ -713,7 +846,6 @@ function init(){
     scriptStartCount = saved.scriptStartCount ?? 0;
     cooldownEnd = saved.cooldownEnd ?? 0;
 
-    // Restore field values after dropdowns are populated
     if(saved.fullName) $("fullName").value = saved.fullName;
     if(saved.email) $("email").value = saved.email;
     if(saved.age) $("age").value = saved.age;
@@ -724,7 +856,6 @@ function init(){
     if(saved.score) $("score").value = saved.score;
     if(saved.whatsapp) $("whatsapp").value = saved.whatsapp;
 
-    // City/area need special handling because area depends on city
     if(saved.city){
       $("city").value = saved.city;
       const areaSel = $("area");
@@ -736,20 +867,17 @@ function init(){
       }
     }
 
-    // Restore script attempt UI state
     $("scriptAttempts").textContent = Math.max(scriptAttempts, 0);
     if(scriptStopLocked){
       const sb = $("scriptStop");
       if(sb){ sb.disabled=true; sb.classList.add("locked"); sb.textContent="Discard Locked"; }
     }
 
-    // If a cooldown was active and still ongoing, resume it
     if(cooldownEnd && cooldownEnd > Date.now()){
       const mic = $("scriptMic");
       if(mic) mic.disabled = true;
       showAttemptModal();
     } else if(cooldownEnd && cooldownEnd <= Date.now()){
-      // Cooldown expired while away — reset
       cooldownEnd = 0;
       scriptAttempts = 2;
       scriptStartCount = 0;
@@ -768,7 +896,6 @@ function init(){
     saveState();
   });
 
-  // Auto-save on any input change
   document.querySelectorAll(".input, select, textarea").forEach(el=>{
     el.addEventListener("change", saveState);
     el.addEventListener("input", saveState);
@@ -927,7 +1054,7 @@ function makeRecorder({micId,stopId,finishId,stateId,timerId,previewId,silenceId
   }
 
   async function start(){
-    if(mic.disabled) return; // hard guard if button is disabled
+    if(mic.disabled) return;
     if(attemptGuards?.canStart && !attemptGuards.canStart()) return;
     try{ stream = await navigator.mediaDevices.getUserMedia({audio:true}); }
     catch(e){ showToast("Microphone permission denied","error"); return; }
@@ -1015,8 +1142,22 @@ function bindIntroRecorder(){
   makeRecorder({
     micId:"introMic",stopId:"introStop",stateId:"introState",timerId:"introTimer",previewId:"introPreview",silenceId:"introSilence",
     maxSec:30,
-    onSaved:b=>{ introBlob=b; showToast("Introduction saved","success"); saveState(); },
-    attemptGuards:{ canStart:()=>true, afterDiscard:()=>{ introBlob=null; saveState(); } }
+    onSaved:b=>{
+      introBlob=b;
+      showToast("Introduction saved","success");
+      saveState();
+      // Amendment (c): pre-encode immediately
+      preUploadIntro(b);
+    },
+    attemptGuards:{
+      canStart:()=>true,
+      afterDiscard:()=>{
+        introBlob=null;
+        preUploadedIntroB64=null;
+        setUploadStatusHTML("introUploadStatus", "");
+        saveState();
+      }
+    }
   });
 }
 
@@ -1024,20 +1165,24 @@ function bindScriptRecorder(){
   makeRecorder({
     micId:"scriptMic",stopId:"scriptStop",finishId:"scriptFinish",stateId:"scriptState",timerId:"scriptTimer",previewId:"scriptPreview",silenceId:"scriptSilence",
     maxSec:60,
-    onSaved:b=>{ scriptBlob=b; showToast("Script saved","success"); saveState(); },
+    onSaved:b=>{
+      scriptBlob=b;
+      showToast("Script saved","success");
+      saveState();
+      // Amendment (c): pre-encode immediately
+      preUploadScript(b);
+    },
     attemptGuards:{
       canStart:()=>{
-        // If mic is locked due to cooldown, show modal
+        // Amendment (b): if cooldown active, show modal (user can close & re-click)
         if(cooldownEnd && cooldownEnd > Date.now()){
           showAttemptModal();
           return false;
         }
-        // If discards are locked and this isn't the very first start, block and start cooldown
         if(scriptStopLocked && scriptStartCount > 0){
           triggerCooldown();
           return false;
         }
-        // First start is free; every subsequent start counts as using a discard slot
         if(scriptStartCount > 0){
           scriptAttempts--;
           $("scriptAttempts").textContent = Math.max(scriptAttempts, 0);
@@ -1056,14 +1201,14 @@ function bindScriptRecorder(){
       },
       afterDiscard:()=>{
         scriptBlob = null;
+        preUploadedScriptB64 = null;
+        setUploadStatusHTML("scriptUploadStatus", "");
         saveState();
       }
     }
   });
 
-  // If scriptStopLocked on load, also disable the mic immediately
   if(scriptStopLocked && !(cooldownEnd && cooldownEnd > Date.now())){
-    // Locked but no active cooldown — mic stays disabled, clicking shows modal
     const mic = $("scriptMic");
     if(mic) mic.disabled = true;
   }
@@ -1090,22 +1235,23 @@ function handleFile(f){
       <div class="meta"><div class="name">${f.name}</div><div class="size">${fileSize(f.size)}</div></div>
       <button type="button" id="removeResume" aria-label="remove">×</button>
     </div>`;
-  $("removeResume").addEventListener("click", ()=>{ resumeFile=null; $("resumePill").innerHTML=""; $("resumeInput").value=""; saveState(); });
-  saveState();
-}
-
-/* ================== SUBMIT ================== */
-function blobToBase64(blob){
-  return new Promise((res,rej)=>{
-    const r=new FileReader();
-    r.onload=()=>res(r.result.split(",")[1]);
-    r.onerror=rej;
-    r.readAsDataURL(blob);
+  $("removeResume").addEventListener("click", ()=>{
+    resumeFile=null;
+    preUploadedResumeB64=null;
+    preUploadedResumeMeta=null;
+    setUploadStatusHTML("resumeUploadStatus", "");
+    $("resumePill").innerHTML="";
+    $("resumeInput").value="";
+    saveState();
   });
+  saveState();
+  // Amendment (c): pre-encode resume immediately
+  preUploadResume(f);
 }
 
+/* ================== SUBMIT — amendment (c): uses pre-encoded data ================== */
 async function submitForm(){
-  overlayFn(true,"Uploading…");
+  overlayFn(true,"Submitting…");
   try{
     const fullName = $("fullName").value.trim();
     const parts = fullName.split(/\s+/);
@@ -1113,11 +1259,21 @@ async function submitForm(){
     const last  = sanitize(parts.slice(1).join("_") || "Candidate");
     const audioName = `${first}_${last}`;
 
-    const introB64  = await blobToBase64(introBlob);
-    const scriptB64 = await blobToBase64(scriptBlob);
-    const resumeB64 = await new Promise((res,rej)=>{
-      const r=new FileReader(); r.onload=()=>res(r.result.split(",")[1]); r.onerror=rej; r.readAsDataURL(resumeFile);
-    });
+    // Use pre-encoded data if available, otherwise encode now (fallback)
+    const introB64  = preUploadedIntroB64 || await blobToBase64(introBlob);
+    const scriptB64 = preUploadedScriptB64 || await blobToBase64(scriptBlob);
+    let resumeB64, resumeName, resumeType;
+    if(preUploadedResumeB64 && preUploadedResumeMeta){
+      resumeB64 = preUploadedResumeB64;
+      resumeName = preUploadedResumeMeta.name;
+      resumeType = preUploadedResumeMeta.type;
+    } else {
+      resumeB64 = await new Promise((res,rej)=>{
+        const r=new FileReader(); r.onload=()=>res(r.result.split(",")[1]); r.onerror=rej; r.readAsDataURL(resumeFile);
+      });
+      resumeName = resumeFile.name;
+      resumeType = resumeFile.type || "application/octet-stream";
+    }
 
     const payload = {
       fullName,
@@ -1134,7 +1290,7 @@ async function submitForm(){
       submittedAt: new Date().toISOString(),
       intro: { filename: `${audioName}_intro.wav`, mimeType: "audio/wav", data: introB64 },
       script:{ filename: `${audioName}_script.wav`, mimeType: "audio/wav", data: scriptB64 },
-      resume:{ filename: resumeFile.name, mimeType: resumeFile.type || "application/octet-stream", data: resumeB64 }
+      resume:{ filename: resumeName, mimeType: resumeType, data: resumeB64 }
     };
 
     const scriptUrl = "https://script.google.com/macros/s/AKfycbwMBJKDxXoVANQiEEuvGGEfgTcpy6xsz6EYH-QjKgLki8dOMSaSSzXCUaWmVOUg5k4GfQ/exec";
@@ -1149,7 +1305,7 @@ async function submitForm(){
       });
     }
     overlayFn(false);
-    clearState(); // clear session on successful submit
+    clearState();
     goTo(6);
   }catch(err){
     console.error(err);
