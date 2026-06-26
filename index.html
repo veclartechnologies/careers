@@ -607,7 +607,7 @@
 
 <script>
 /* ================== CONFIG ================== */
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwMBJKDxXoVANQiEEuvGGEfgTcpy6xsz6EYH-QjKgLki8dOMSaSSzXCUaWmVOUg5k4GfQ/exec";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwBTUGAzQeothThArXSzWk30fy0j3CiNUAx9i00RwXcNZ6LEI7BpM96yzBOL5e6RxPy/exec";
 const TOTAL_VISIBLE_STEPS = 5;
 const STEP_NAMES = ["Personal Information","Academic Information","Voice Introduction","Script Recording","Resume Upload","Submitted"];
 const COOLDOWN_SEC = 120; // 2 minutes
@@ -790,7 +790,7 @@ async function preUploadIntro(blob){
   setUploadStatusHTML("introUploadStatus", "uploading", "Pre-encoding audio…");
   try{
     preUploadedIntroB64 = await blobToBase64(blob);
-    setUploadStatusHTML("introUploadStatus", "uploaded", "Audio ready for submission");
+    setUploadStatusHTML("introUploadStatus", "uploaded", "Uploaded successfully");
   }catch(e){
     console.error("Pre-upload intro failed", e);
     preUploadedIntroB64 = null;
@@ -802,7 +802,7 @@ async function preUploadScript(blob){
   setUploadStatusHTML("scriptUploadStatus", "uploading", "Pre-encoding audio…");
   try{
     preUploadedScriptB64 = await blobToBase64(blob);
-    setUploadStatusHTML("scriptUploadStatus", "uploaded", "Audio ready for submission");
+    setUploadStatusHTML("scriptUploadStatus", "uploaded", "Uploaded successfully");
   }catch(e){
     console.error("Pre-upload script failed", e);
     preUploadedScriptB64 = null;
@@ -818,7 +818,7 @@ async function preUploadResume(file){
     });
     preUploadedResumeB64 = b64;
     preUploadedResumeMeta = { name: file.name, type: file.type || "application/octet-stream" };
-    setUploadStatusHTML("resumeUploadStatus", "uploaded", "Resume ready for submission");
+    setUploadStatusHTML("resumeUploadStatus", "uploaded", "Uploaded successfully");
   }catch(e){
     console.error("Pre-upload resume failed", e);
     preUploadedResumeB64 = null;
@@ -1293,7 +1293,7 @@ async function submitForm(){
       resume:{ filename: resumeName, mimeType: resumeType, data: resumeB64 }
     };
 
-    const scriptUrl = "https://script.google.com/macros/s/AKfycbwMBJKDxXoVANQiEEuvGGEfgTcpy6xsz6EYH-QjKgLki8dOMSaSSzXCUaWmVOUg5k4GfQ/exec";
+    const scriptUrl = "https://script.google.com/macros/s/AKfycbwBTUGAzQeothThArXSzWk30fy0j3CiNUAx9i00RwXcNZ6LEI7BpM96yzBOL5e6RxPy/exec";
     if(!scriptUrl || scriptUrl.includes("REPLACE")){
       console.warn("APPS_SCRIPT_URL not set — showing success without remote submit.");
     } else {
