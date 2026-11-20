@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#121318">
+<title>HR Dashboard — Veclar Technologies</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Muli:wght@300;400;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box}
+:root{--bg:#121318;--bg2:#191c26;--ink:#f7f4ec;--muted:#a8a49a;--line:rgba(255,255,255,.1);--panel:rgba(255,255,255,.05);--brand:#d5a62a;--brand2:#f0d489;--ok:#37d399;--bad:#ff6b6b;--warn:#f2c88a;--shadow:0 30px 70px -40px rgba(0,0,0,.95)}
+html,body{margin:0;padding:0;height:100%}
+body{background:var(--bg);color:var(--ink);font-family:'Muli',Poppins,system-ui,sans-serif;font-size:14.5px;line-height:1.6;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0;z-index:-1;background:radial-gradient(800px 500px at 8% -6%,rgba(213,166,42,.16),transparent 60%),radial-gradient(700px 500px at 92% 0,rgba(240,212,137,.08),transparent 62%)}
+h1,h2,h3,h4,.fd{font-family:'Poppins','Muli',sans-serif;letter-spacing:-.01em;margin:0;font-weight:600}
+button{font-family:inherit}
+[hidden]{display:none!important}
+a{color:var(--brand2)}
+/* login */
+.login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.lcard{width:100%;max-width:410px;background:linear-gradient(165deg,rgba(255,255,255,.07),rgba(255,255,255,.03));border:1px solid var(--line);border-radius:24px;padding:32px 28px;box-shadow:var(--shadow);backdrop-filter:blur(18px)}
+.mark{width:46px;height:46px;border-radius:12px;display:grid;place-items:center;background:rgba(255,255,255,.04);border:1px solid rgba(213,166,42,.32);margin-bottom:18px}
+.mark img{width:100%;height:100%;object-fit:contain;padding:4px;border-radius:11px}
+.lcard h1{font-size:22px;margin-bottom:6px}
+.lcard p{color:var(--muted);font-size:13.5px;margin:0 0 22px}
+label{display:block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#a49b83;margin-bottom:6px;font-family:'Poppins',sans-serif}
+input,select,textarea{width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.13);background:rgba(255,255,255,.045);color:var(--ink);font-size:14.5px;font-family:inherit;transition:.18s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:rgba(213,166,42,.85);box-shadow:0 0 0 4px rgba(213,166,42,.13)}
+select option{background:#1c1d26}
+textarea{resize:vertical;min-height:74px}
+.field{margin-bottom:14px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 20px;border-radius:12px;border:1px solid transparent;font-size:13.5px;font-weight:600;cursor:pointer;transition:.16s;font-family:'Poppins',sans-serif;text-decoration:none}
+.btn:active{transform:translateY(1px)}
+.btn-p{background:linear-gradient(135deg,#e0b23c,#c1921f);color:#1b1608;box-shadow:0 14px 30px -18px rgba(213,166,42,.95)}
+.btn-g{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.14);color:#e6e1d5}
+.btn-g:hover{background:rgba(255,255,255,.1)}
+.btn-ok{background:linear-gradient(135deg,#37d399,#20a978);color:#04170f}
+.btn-bad{background:rgba(255,107,107,.16);border-color:rgba(255,107,107,.4);color:#ffc2c2}
+.btn-sm{padding:8px 13px;font-size:12px;border-radius:10px}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.w100{width:100%}
+.err{display:none;margin:0 0 14px;padding:10px 13px;border-radius:11px;background:rgba(255,107,107,.12);border:1px solid rgba(255,107,107,.34);color:#ffc2c2;font-size:13px}
+.err.on{display:block}
+/* shell */
+.shell{display:flex;min-height:100vh}
+.side{width:236px;flex:none;border-right:1px solid var(--line);background:rgba(22,23,30,.75);backdrop-filter:blur(14px);padding:20px 14px;display:flex;flex-direction:column;gap:6px;position:sticky;top:0;height:100vh}
+.sbrand{display:flex;align-items:center;gap:11px;padding:0 6px 18px;margin-bottom:6px;border-bottom:1px solid var(--line)}
+.sbrand .mark{margin:0;width:36px;height:36px;border-radius:0;background:none;border:0}
+.sbrand .mark img{padding:0;border-radius:0}
+.sbrand b{display:block;font-size:12.5px;font-family:'Poppins',sans-serif}
+.sbrand span{font-size:9.5px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
+.nav-btn{display:flex;align-items:center;gap:11px;padding:11px 13px;border-radius:11px;border:0;background:none;color:#b6b1a5;font-size:13.5px;font-weight:500;cursor:pointer;text-align:left;transition:.15s;font-family:'Poppins',sans-serif}
+.nav-btn:hover{background:rgba(255,255,255,.06);color:#f2eee4}
+.nav-btn.on{background:rgba(213,166,42,.15);color:#fff;box-shadow:inset 0 0 0 1px rgba(213,166,42,.35)}
+.nav-btn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.side-foot{margin-top:auto;padding-top:14px;border-top:1px solid var(--line);font-size:11.5px;color:var(--muted)}
+.side-foot b{display:block;color:#ded9cd;font-size:12px;word-break:break-all;margin-bottom:8px}
+.main{flex:1;min-width:0;padding:22px 26px 70px;max-width:1420px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:22px;flex-wrap:wrap}
+.topbar h1{font-size:22px}
+.topbar p{margin:3px 0 0;color:var(--muted);font-size:12.5px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+/* cards */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(146px,1fr));gap:12px;margin-bottom:20px}
+.stat{background:linear-gradient(160deg,rgba(255,255,255,.065),rgba(255,255,255,.025));border:1px solid var(--line);border-radius:16px;padding:16px 17px;position:relative;overflow:hidden}
+.stat span{display:block;font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:#a49b83;margin-bottom:8px;font-family:'Poppins',sans-serif}
+.stat b{font-family:'Poppins',sans-serif;font-size:26px;font-weight:600;line-height:1}
+.stat i{position:absolute;right:-18px;top:-18px;width:58px;height:58px;border-radius:50%;background:rgba(213,166,42,.13)}
+.panel{background:linear-gradient(165deg,rgba(255,255,255,.055),rgba(255,255,255,.02));border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:16px}
+.panel h3{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#a49b83;font-weight:600;margin-bottom:14px;font-family:'Poppins',sans-serif}
+.panel-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.panel-head h3{margin:0}
+.two{display:grid;grid-template-columns:1.55fr 1fr;gap:16px}
+@media(max-width:1000px){.two{grid-template-columns:1fr}}
+.chart{width:100%;height:180px;display:block}
+.bars{display:grid;gap:9px;max-height:260px;overflow:auto}
+.bar{display:grid;grid-template-columns:112px 1fr 34px;gap:10px;align-items:center;font-size:12px;color:#c2bdb0}
+.bar .t{height:7px;border-radius:99px;background:rgba(255,255,255,.09);overflow:hidden}
+.bar .t i{display:block;height:100%;background:linear-gradient(90deg,var(--brand),var(--brand2));border-radius:99px}
+.bar em{font-style:normal;text-align:right;color:#f0e9d9;font-weight:700}
+/* table */
+.tblwrap{overflow-x:auto;border:1px solid var(--line);border-radius:14px}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:900px}
+th{text-align:left;padding:11px 13px;font-size:10px;letter-spacing:.11em;text-transform:uppercase;color:#a49b83;background:rgba(255,255,255,.04);white-space:nowrap;font-weight:600;font-family:'Poppins',sans-serif}
+td{padding:11px 13px;border-top:1px solid rgba(255,255,255,.06);white-space:nowrap;color:#ddd8cb}
+tbody tr:hover{background:rgba(213,166,42,.07);cursor:pointer}
+.badge{display:inline-flex;align-items:center;padding:4px 10px;border-radius:99px;font-size:11px;font-weight:600;font-family:'Poppins',sans-serif}
+.s-UnderReview{background:rgba(213,166,42,.16);color:#f0dca8}
+.s-Shortlisted{background:rgba(242,200,138,.15);color:#f2d9a8}
+.s-Interview{background:rgba(126,180,255,.15);color:#cfe2ff}
+.s-Training{background:rgba(55,211,153,.16);color:#a9e8cd}
+.s-Rejected{background:rgba(255,107,107,.14);color:#ffc2c2}
+.s-Hired{background:rgba(55,211,153,.18);color:#a9e8cd}
+.pager{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:14px;font-size:12.5px;color:var(--muted)}
+.filters{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:9px;margin-bottom:14px}
+@media(max-width:900px){.filters{grid-template-columns:1fr 1fr}}
+.empty{padding:38px 16px;text-align:center;color:var(--muted);font-size:13px}
+/* skeleton preloaders */
+.sk{background:linear-gradient(90deg,rgba(255,255,255,.05) 25%,rgba(255,255,255,.11) 37%,rgba(255,255,255,.05) 63%);background-size:400% 100%;animation:sk 1.3s ease-in-out infinite;border-radius:8px}
+@keyframes sk{0%{background-position:100% 50%}100%{background-position:0 50%}}
+.sk-row{display:flex;gap:14px;align-items:center;padding:13px 14px;border-top:1px solid rgba(255,255,255,.05)}
+.sk-row .sk{height:11px}
+.sk-card{height:88px;border-radius:16px}
+.sk-line{height:12px;margin-bottom:12px}
+.sk-line.w40{width:40%}.sk-line.w60{width:60%}.sk-line.w80{width:80%}
+/* bottom progress bar */
+#loadbar{position:fixed;left:0;right:0;bottom:0;z-index:60;background:rgba(22,23,30,.97);border-top:1px solid var(--line);transform:translateY(110%);transition:transform .35s cubic-bezier(.16,1,.3,1)}
+#loadbar.on{transform:none}
+#loadbar .track{height:4px;background:rgba(255,255,255,.08)}
+#loadbar .fill{height:100%;width:0;background:linear-gradient(90deg,var(--brand),var(--brand2));transition:width .4s ease}
+#loadbar.bad .fill{background:linear-gradient(90deg,#ff6b6b,#d94242)}
+#loadbar .meta{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:9px 16px;font-size:11.5px;color:#c2bdb0}
+#loadbar .meta b{color:#f3e8cd;font-family:'Poppins',sans-serif}
+#loadbar.bad .meta b{color:#ffc2c2}
+/* modal */
+.ov{position:fixed;inset:0;z-index:70;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(8,8,11,.8);backdrop-filter:blur(8px)}
+.ov.on{display:flex}
+.modal{width:100%;max-width:900px;max-height:92vh;overflow:auto;background:linear-gradient(165deg,#1f2029,#16171f);border:1px solid rgba(255,255,255,.13);border-radius:22px;padding:24px;box-shadow:0 40px 90px -30px #000;animation:pop .26s cubic-bezier(.16,1,.3,1)}
+.modal.sm{max-width:480px}
+@keyframes pop{from{opacity:0;transform:translateY(14px) scale(.98)}to{opacity:1;transform:none}}
+.mhead{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+.mhead h2{font-size:20px}
+.mhead p{margin:4px 0 0;color:var(--muted);font-size:12.5px}
+.x{background:rgba(255,255,255,.07);border:0;color:#ded9cd;width:34px;height:34px;border-radius:10px;cursor:pointer;font-size:17px;line-height:1;flex:none}
+.sec{border:1px solid var(--line);border-radius:14px;padding:15px;margin-bottom:12px;background:rgba(255,255,255,.025)}
+.sec h4{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#a49b83;margin-bottom:10px;font-family:'Poppins',sans-serif}
+.kv{display:grid;grid-template-columns:150px 1fr;gap:5px 14px;font-size:13px}
+.kv dt{color:var(--muted);font-size:12.5px}
+.kv dd{margin:0;color:#f0ebde;word-break:break-word}
+.timeline{display:grid;gap:9px;font-size:12.5px}
+.tl{display:grid;grid-template-columns:auto 1fr;gap:10px;padding:9px 11px;border-radius:10px;background:rgba(255,255,255,.03)}
+.tl b{color:#f0ebde;font-weight:600}
+.tl span{color:var(--muted);font-size:11.5px}
+.note{padding:11px 13px;border-radius:11px;background:rgba(213,166,42,.08);border:1px solid rgba(213,166,42,.22);margin-bottom:8px}
+.note p{margin:0 0 6px;font-size:13px;color:#f0ebde;white-space:pre-wrap}
+.note footer{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--muted)}
+.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);z-index:95;padding:11px 19px;border-radius:11px;background:#262730;border:1px solid rgba(255,255,255,.16);font-size:13px;opacity:0;transition:.3s;pointer-events:none;max-width:92vw}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.spin{width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;animation:spin .7s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{padding:4px 10px;border-radius:99px;background:rgba(255,255,255,.07);font-size:11.5px;color:#ddd8cb}
+.hint{font-size:12px;color:var(--muted)}
+/* file cards */
+.filecard{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid var(--line);margin-bottom:10px;text-decoration:none;color:inherit;transition:.18s;cursor:pointer}
+.filecard:hover{background:rgba(213,166,42,.12);border-color:rgba(213,166,42,.5);transform:translateY(-1px)}
+.filecard .fi{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:rgba(213,166,42,.16);color:var(--brand2);flex:none;font-size:13px;font-weight:700;font-family:'Poppins',sans-serif}
+.filecard b{display:block;font-size:13px;font-family:'Poppins',sans-serif}
+.filecard span{display:block;font-size:11.5px;color:var(--muted)}
+.filecard em{margin-left:auto;font-style:normal;font-size:11.5px;color:var(--brand2);white-space:nowrap}
+.filecard.off{opacity:.55;pointer-events:none}
+@media(max-width:860px){
+ .shell{flex-direction:column}
+ .side{width:100%;height:auto;position:static;flex-direction:row;overflow-x:auto;align-items:center;padding:10px 12px;gap:4px;border-right:0;border-bottom:1px solid var(--line)}
+ .sbrand{border:0;padding:0 10px 0 0;margin:0}
+ .sbrand div:last-child{display:none}
+ .side-foot{display:none}
+ .nav-btn{white-space:nowrap;padding:9px 12px}
+ .main{padding:16px 14px 60px}
+ .kv{grid-template-columns:1fr}
+ .kv dd{margin-bottom:7px}
+ .topbar h1{font-size:19px}
+}
+</style>
+<script>
+    (function() {
+        var buffer = window.__base44_preview_native_failures;
+        if (!buffer || buffer.version !== 1 || !Array.isArray(buffer.entries)) {
+            buffer = { version: 1, entries: [], listenersInstalled: false };
+            window.__base44_preview_native_failures = buffer;
+        }
+        if (buffer.listenersInstalled) return;
+        function value(object, key) {
+            return object && typeof object[key] === 'string' ? object[key] : '';
+        }
+        function append(message) {
+            if (!message) return;
+            var normalizedMessage = String(message).slice(0, 5000);
+            for (var index = buffer.entries.length - 1; index >= 0; index--) {
+                var existing = buffer.entries[index];
+                if (existing && existing.level === 'error' && existing.message === normalizedMessage) {
+                    buffer.entries.splice(index, 1);
+                }
+            }
+            buffer.entries.push({
+                level: 'error',
+                message: normalizedMessage,
+                timestamp: Date.now()
+            });
+            if (buffer.entries.length > 100) {
+                buffer.entries.splice(0, buffer.entries.length - 100);
+            }
+        }
+        buffer.append = append;
+        function handleError(event) {
+            var target = event && event.target;
+            var tagName = value(target, 'tagName').toLowerCase() || 'window';
+            var isModule = tagName === 'script' && value(target, 'type').toLowerCase() === 'module';
+            var resourceType = isModule ? 'module' : tagName;
+            var url = value(target, 'src') || value(target, 'href') || value(event, 'filename');
+            var detail = value(event, 'message') || value(event && event.error, 'message');
+            var prefix = tagName === 'window' ? 'Native browser error' : 'Failed to load ' + resourceType;
+            append(prefix + (url ? ' ' + url : '') + (detail ? ': ' + detail : ''));
+        }
+        function rejectionReason(reason) {
+            if (typeof reason === 'string') return reason;
+            var message = value(reason, 'message');
+            if (message) return message;
+            try { return JSON.stringify(reason) || String(reason); }
+            catch (e) { return String(reason); }
+        }
+        function handleRejection(event) {
+            append('Unhandled promise rejection: ' + rejectionReason(event && event.reason));
+        }
+        function handleCspViolation(event) {
+            var blockedUri = value(event, 'blockedURI') || 'resource';
+            var directive = value(event, 'violatedDirective');
+            append('Content Security Policy blocked ' + blockedUri + (directive ? ' (' + directive + ')' : ''));
+        }
+        function overlayText(root, selector) {
+            var element = root && root.querySelector(selector);
+            return value(element, 'textContent').trim();
+        }
+        function captureViteOverlay(overlay) {
+            var root = overlay && overlay.shadowRoot;
+            var message = overlayText(root, '.message-body');
+            if (!message) return;
+            var plugin = overlayText(root, '.plugin');
+            var details = ['Vite build error: ' + (plugin ? plugin + ' ' : '') + message];
+            var file = overlayText(root, '.file');
+            var frame = overlayText(root, '.frame');
+            var stack = overlayText(root, '.stack');
+            if (file) details.push('File: ' + file);
+            if (frame) details.push(frame);
+            if (stack) details.push(stack);
+            append(details.join(String.fromCharCode(10)));
+        }
+        function captureViteOverlays(node) {
+            if (!node || node.nodeType !== 1) return;
+            if (node.matches && node.matches('vite-error-overlay')) captureViteOverlay(node);
+            if (!node.querySelectorAll) return;
+            var overlays = node.querySelectorAll('vite-error-overlay');
+            for (var index = 0; index < overlays.length; index++) captureViteOverlay(overlays[index]);
+        }
+        window.addEventListener('error', handleError, true);
+        window.addEventListener('unhandledrejection', handleRejection);
+        window.addEventListener('securitypolicyviolation', handleCspViolation);
+        if (typeof MutationObserver !== 'undefined' && document.documentElement) {
+            captureViteOverlays(document.documentElement);
+            new MutationObserver(function(records) {
+                for (var recordIndex = 0; recordIndex < records.length; recordIndex++) {
+                    var nodes = records[recordIndex].addedNodes;
+                    for (var nodeIndex = 0; nodeIndex < nodes.length; nodeIndex++) {
+                        captureViteOverlays(nodes[nodeIndex]);
+                    }
+                }
+            }).observe(document.documentElement, { childList: true, subtree: true });
+        }
+        buffer.listenersInstalled = true;
+    })();
+    </script><script data-preview-data-env-pin="true">
+    (function() {
+        var KEY = 'base44_data_env';
+        var APP_API_PATH = "/api/apps/6aff61c90c6ada98e05123ee/";
+        var STORAGE_KEY = KEY + ':' + APP_API_PATH;
+        var API_ORIGINS = ["https://app.base44.com", "https://base44.app"].map(function(u) { return new URL(u).origin; });
+        var REQUEST_INIT_KEYS = [
+            'method', 'headers', 'credentials', 'mode', 'cache', 'redirect',
+            'referrer', 'referrerPolicy', 'integrity', 'keepalive', 'signal', 'priority',
+        ];
+        var env = new URLSearchParams(window.location.search).get(KEY);
+        try {
+            if (env === 'dev' || env === 'prod') sessionStorage.setItem(STORAGE_KEY, env);
+            else env = sessionStorage.getItem(STORAGE_KEY);
+        } catch (e) {}
+        if (env !== 'dev' && env !== 'prod') return;
+        function pin(url) {
+            try {
+                var u = new URL(url, window.location.href);
+                var sameOrigin = u.origin === window.location.origin;
+                if (!sameOrigin && API_ORIGINS.indexOf(u.origin) === -1) return url;
+                // The app's own server routes and TanStack server functions build
+                // their SDK client from this request, so they need the selection too.
+                var appServerPath = sameOrigin && (
+                    u.pathname.startsWith('/api/') || u.pathname.startsWith('/_serverFn/')
+                );
+                if (!appServerPath && !u.pathname.startsWith(APP_API_PATH)) return url;
+                // Privileged function/agent routes trust this app's Preview host,
+                // not a dev parameter sent to the generic SDK API origin.
+                if (u.origin !== window.location.origin && (
+                    u.pathname.startsWith(APP_API_PATH + 'functions/') ||
+                    u.pathname.startsWith(APP_API_PATH + 'agents/')
+                )) {
+                    u = new URL(u.pathname + u.search + u.hash, window.location.origin);
+                }
+                u.searchParams.set(KEY, env);
+                return u.toString();
+            } catch (e) { return url; }
+        }
+        var origFetch = window.fetch;
+        window.fetch = function(input, init) {
+            if (typeof input === 'string' || input instanceof URL) {
+                return origFetch.call(this, pin(String(input)), init);
+            }
+            if (!input || !input.url) return origFetch.call(this, input, init);
+            var pinned = pin(input.url);
+            if (pinned === input.url) return origFetch.call(this, input, init);
+            try {
+                input = new Request(input, init);
+                if (!input.keepalive || !input.body) {
+                    return origFetch.call(this, new Request(pinned, input));
+                }
+                // RequestInit exposes an existing body as a stream, which Fetch
+                // forbids with keepalive. Buffer only that case, after init overrides.
+                var self = this;
+                return input.blob().then(function(body) {
+                    var rebuilt = { body: body };
+                    REQUEST_INIT_KEYS.forEach(function(key) {
+                        if (input[key] !== undefined) rebuilt[key] = input[key];
+                    });
+                    return origFetch.call(self, new Request(pinned, rebuilt));
+                });
+            } catch (error) { return Promise.reject(error); }
+        };
+        var origOpen = XMLHttpRequest.prototype.open;
+        XMLHttpRequest.prototype.open = function(method, url) {
+            arguments[1] = pin(String(url));
+            return origOpen.apply(this, arguments);
+        };
+    })();
+    </script><script defer data-preview-inject="true" data-parent-origins="https://app.base44.com https://superagent.base44.com" data-app-id="6aff61c90c6ada98e05123ee" data-preview-type="latest_preview" data-rum-app-id="db50c921-10c3-4f12-bccb-950fa174b708" data-rum-client-token="pubfe8a4f2972b412b4556fd67e77f82cb4" data-dd-site="datadoghq.com" src="https://app.base44.com/builder-bridge.js?t=1795205267"></script><script>
+    (function() {
+        var IGNORE = { SCRIPT: 1, STYLE: 1, LINK: 1, META: 1, NOSCRIPT: 1, TEMPLATE: 1 };
+        const fire = () => window.parent.postMessage({ type: 'IFRAME_CONTENT_READY' }, '*');
+        function check() {
+            var body = document.body;
+            if (!body) return false;
+            for (var idx = 0; idx < body.children.length; idx++) {
+                if (!IGNORE[body.children[idx].tagName]) return true;
+            }
+            return false;
+        }
+        function start() {
+            if (check()) { fire(); return; }
+            var observer = new MutationObserver(function() {
+                if (check()) { fire(); observer.disconnect(); }
+            });
+            observer.observe(document.documentElement, { childList: true, subtree: true });
+        }
+        if (document.body) { start(); }
+        else { document.addEventListener('DOMContentLoaded', start, { once: true }); }
+    })();
+    </script><script>
+    (function() {
+        if (window.self === window.top) return;
+        var APP_ID = "6aff61c90c6ada98e05123ee";
+        var PREVIEW_TYPE = "latest_preview";
+        var on404 = false;
+        var booted = false;
+        function detect() { return !!document.querySelector('[data-source-location^="PageNotFound:"]'); }
+        function payload() { return { app_id: APP_ID, preview_type: PREVIEW_TYPE, url_path: window.location.pathname }; }
+        function tick() {
+            var now = detect();
+            if (now && !on404) {
+                on404 = true;
+                window.parent.postMessage({ type: 'PREVIEW_PAGE_NOT_FOUND', payload: payload() }, '*');
+            } else if (!now && (on404 || !booted)) {
+                // On first tick of a fresh document, emit a cleared signal even when
+                // not currently on a 404 — the parent may have latched is404=true from
+                // a previous document at the same URL (e.g. after an iframe reload).
+                on404 = false;
+                window.parent.postMessage({ type: 'PREVIEW_PAGE_NOT_FOUND_CLEARED', payload: payload() }, '*');
+            }
+            booted = true;
+        }
+        function start() {
+            tick();
+            new MutationObserver(tick).observe(document.body, { childList: true, subtree: true });
+        }
+        if (document.body) { start(); }
+        else { document.addEventListener('DOMContentLoaded', start, { once: true }); }
+    })();
+    </script><script>
+    (function() {
+        if (window.self === window.top) return;
+        var HEADINGS = ["Your app will appear here", "Your app starts here"];
+        var shown = false;
+        var booted = false;
+        var documentId = Math.random().toString(36).slice(2);
+        function detect() {
+            var hs = document.getElementsByTagName('h1');
+            for (var i = 0; i < hs.length; i++) {
+                if (HEADINGS.indexOf((hs[i].textContent || '').trim()) !== -1) return true;
+            }
+            return false;
+        }
+        function payload() { return { app_id: "6aff61c90c6ada98e05123ee", preview_type: "latest_preview", url_path: window.location.pathname, document_id: documentId }; }
+        function tick() {
+            var now = detect();
+            if (now && !shown) {
+                shown = true;
+                window.parent.postMessage({ type: 'PREVIEW_TEMPLATE_HOME_SHOWN', payload: payload() }, '*');
+            } else if (!now && (shown || !booted)) {
+                shown = false;
+                window.parent.postMessage({ type: 'PREVIEW_TEMPLATE_HOME_CLEARED', payload: payload() }, '*');
+            }
+            booted = true;
+        }
+        function start() {
+            tick();
+            new MutationObserver(tick).observe(document.body, { childList: true, subtree: true, characterData: true });
+        }
+        if (document.body) { start(); }
+        else { document.addEventListener('DOMContentLoaded', start, { once: true }); }
+    })();
+    </script><script>
+    (function() {
+        if (window.self === window.top) return;
+        function postUnsupported(reason) {
+            window.parent.postMessage({
+                type: 'IFRAME_FIRST_CONTENTFUL_PAINT_UNSUPPORTED',
+                payload: { reason: reason, userAgent: navigator.userAgent }
+            }, '*');
+        }
+        if (typeof PerformanceObserver === 'undefined') {
+            postUnsupported('no_performance_observer');
+            return;
+        }
+        try {
+            var obs = new PerformanceObserver(function(list) {
+                var entries = list.getEntries();
+                for (var i = 0; i < entries.length; i++) {
+                    if (entries[i].name === 'first-contentful-paint') {
+                        obs.disconnect();
+                        window.parent.postMessage({ type: 'IFRAME_FIRST_CONTENTFUL_PAINT' }, '*');
+                        return;
+                    }
+                }
+            });
+            obs.observe({ type: 'paint', buffered: true });
+        } catch (e) {
+            postUnsupported('observe_threw:' + (e && e.name ? e.name : 'Error'));
+        }
+    })();
+    </script><script>
+    (function() {
+        if (window.self === window.top) return;
+        var lastUrl = window.location.href;
+        function notify() {
+            var url = window.location.href;
+            if (url === lastUrl) return;
+            lastUrl = url;
+            window.parent.postMessage({ type: 'APP_CHANGED_URL', url: url }, '*');
+        }
+        var origPush = history.pushState.bind(history);
+        history.pushState = function() { origPush.apply(history, arguments); notify(); };
+        var origReplace = history.replaceState.bind(history);
+        history.replaceState = function() { origReplace.apply(history, arguments); notify(); };
+        window.addEventListener('popstate', notify);
+        window.parent.postMessage({ type: 'APP_CHANGED_URL', url: window.location.href }, '*');
+    })();
+    </script></head>
+<body>
+
+<div class="login" id="loginView">
+  <form class="lcard" id="loginForm" autocomplete="on">
+    <div class="mark"><img id="loginLogo" src="" alt="Veclar Technologies"></div>
+    <h1>HR Dashboard</h1>
+    <p>Veclar Technologies · Business Development Executive</p>
+    <div class="err" id="loginErr"></div>
+    <div class="field"><label for="l_email">Administrator email</label><input type="email" id="l_email" placeholder="hr@veclartechnologies.com" autocomplete="username"></div>
+    <div class="field"><label for="l_pass">Password</label><input type="password" id="l_pass" placeholder="••••••••" autocomplete="current-password"></div>
+    <button class="btn btn-p w100" type="submit" id="loginBtn">Sign in</button>
+    <p class="hint" style="margin-top:16px;text-align:center">Access is restricted to allowlisted administrators.</p>
+  </form>
+</div>
+
+<div class="shell" id="shell" hidden>
+  <aside class="side">
+    <div class="sbrand"><div class="mark"><img id="sideLogo" src="" alt="Veclar"></div><div><b>Veclar</b><span>HR Console</span></div></div>
+    <button class="nav-btn on" data-view="overview"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>Overview</button>
+    <button class="nav-btn" data-view="apps"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>Applications</button>
+    <button class="nav-btn" data-view="batches"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/></svg>Training batches</button>
+    <button class="nav-btn" data-view="emails"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>Email logs</button>
+    <div class="side-foot"><b id="sideEmail">—</b><button class="btn btn-g btn-sm w100" id="logoutBtn">Sign out</button></div>
+  </aside>
+  <div class="main">
+    <div class="topbar"><div><h1 id="viewTitle">Overview</h1><p id="viewSub">Live recruitment metrics</p></div><div class="row" id="viewActions"></div></div>
+    <div id="view"></div>
+  </div>
+</div>
+
+<div id="loadbar"><div class="track"><div class="fill" id="loadFill"></div></div><div class="meta"><b id="loadLabel">Loading…</b><span id="loadPct">0%</span></div></div>
+<div class="ov" id="ov"><div class="modal" id="modal"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const VECLAR_CONFIG = { API_URL: 'https://script.google.com/macros/s/AKfycbztx8IrCMnrHjLYkgAe1MJDRbc7d226YMko-uIYHwNG8DU3A1Sf2FWuWVcLzIwD7nZAbA/exec', LOGO_URL: 'https://raw.githubusercontent.com/veclartechnologies/nexus/refs/heads/main/logo_vt.png' };
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const TOKEN_KEY = 'veclar_admin_token';
+const STATUSES = ['Under Review','Shortlisted','Interview','Training','Rejected','Hired'];
+const DEFAULT_INTERVIEW_LOCATION = 'Building A-14, Sector F, DHA Phase 1, Rawalpindi';
+
+/* real Pakistani Standard Time, whatever the stored value looks like */
+function pkt(v){
+  if (!v) return '—';
+  const s = String(v).trim();
+  let d;
+  if (/^\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}/.test(s)) d = new Date(s.replace(' ', 'T') + '+05:00');
+  else d = new Date(s);
+  if (isNaN(d.getTime())) return s;
+  return d.toLocaleString('en-GB', { timeZone:'Asia/Karachi', day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit', hour12:true });
+}
+function pktDate(v){
+  if (!v) return '—';
+  const s = String(v).trim();
+  const m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (m) return new Date(m[1] + '-' + m[2] + '-' + m[3] + 'T12:00:00Z').toLocaleDateString('en-GB', { timeZone:'UTC', day:'2-digit', month:'short', year:'numeric' });
+  const d = new Date(s);
+  return isNaN(d.getTime()) ? s : d.toLocaleDateString('en-GB', { timeZone:'Asia/Karachi', day:'2-digit', month:'short', year:'numeric' });
+}
+
+const API = {
+  configured(){ return !VECLAR_CONFIG.API_URL.includes('PASTE_DEPLOYMENT_ID'); },
+  async call(action, payload = {}) {
+    if (!this.configured()) throw new Error('Backend not configured. Set API_URL in admin.html to your Apps Script /exec URL.');
+    const body = JSON.stringify(Object.assign({ action }, payload));
+    let lastErr = null;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        const res = await fetch(VECLAR_CONFIG.API_URL, { method:'POST', redirect:'follow', cache:'no-store', headers:{ 'Content-Type':'text/plain;charset=utf-8' }, body });
+        let text = await res.text();
+        if (text.slice(0,4) === ")]}'") text = text.slice(4);
+        const t = text.trim();
+        if (t.charAt(0) !== '{') throw new Error('Unexpected reply from the server (HTTP ' + res.status + ').');
+        const json = JSON.parse(t);
+        if (!json.success) { const e = new Error(json.message || 'Request failed.'); e.code = json.error; e.backend = true; throw e; }
+        return json.data;
+      } catch (err) {
+        if (err.backend) throw err;
+        lastErr = err;
+        if (attempt < 2) await sleep(700 * (attempt + 1));
+      }
+    }
+    throw lastErr || new Error('Network error.');
+  }
+};
+
+const S = {
+  token: sessionStorage.getItem(TOKEN_KEY) || '', email: '', view: 'overview',
+  apps: [], batches: [], emails: [], loaded: false,
+  filters: { search:'', status:'All', from:'', to:'', sort:'newest', months:'all' },
+  page: 1, pageSize: 25
+};
+
+function toast(msg){ const t = $('toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('on'), 3200); }
+function modal(html, small){ $('modal').className = 'modal' + (small ? ' sm' : ''); $('modal').innerHTML = html; $('ov').classList.add('on'); }
+function closeModal(){ $('ov').classList.remove('on'); }
+function busy(btn, on, label){ if (!btn) return; if (on) { btn.dataset.l = btn.innerHTML; btn.innerHTML = '<span class="spin"></span> ' + (label || 'Working'); btn.disabled = true; } else { btn.innerHTML = btn.dataset.l || btn.innerHTML; btn.disabled = false; } }
+function badge(status){ return '<span class="badge s-' + String(status || '').replace(/\s/g,'') + '">' + esc(status) + '</span>'; }
+
+/* ------------------------- bottom loading progress ----------------------- */
+function setBar(pct, label, bad){
+  const bar = $('loadbar');
+  bar.classList.add('on');
+  bar.classList.toggle('bad', !!bad);
+  $('loadFill').style.width = Math.max(0, Math.min(100, pct)) + '%';
+  $('loadPct').textContent = Math.round(pct) + '%';
+  if (label) $('loadLabel').textContent = label;
+}
+function hideBar(){ setTimeout(() => { $('loadbar').classList.remove('on'); }, 700); }
+/* progress animation for writes, not only the first load */
+function progStart(label){ setBar(16, label); setTimeout(() => { if ($('loadbar').classList.contains('on')) setBar(74, label); }, 550); }
+function progDone(label, bad){ setBar(100, label, bad); hideBar(); }
+
+function errorModal(title, message){
+  modal('<div class="mhead"><div><h2>' + esc(title) + '</h2><p>Something went wrong while talking to the database.</p></div><button class="x" id="eClose">×</button></div>' +
+    '<div class="err on" style="margin-bottom:16px">' + esc(message) + '</div>' +
+    '<div class="row"><button class="btn btn-p" id="eRetry">Try again</button></div>', true);
+  $('eClose').onclick = closeModal;
+  $('eRetry').onclick = () => { closeModal(); loadAll(); };
+}
+
+/* ------------------------------ data loading ----------------------------- */
+async function loadAll(){
+  if (!S.token) return;
+  setBar(4, 'Connecting to the recruitment database…');
+  try {
+    setBar(10, 'Loading applications…');
+    const first = await API.call('adminListApplications', { token: S.token, page: 1, pageSize: 500, status: 'All', search: '', sort: 'newest' });
+    let items = first.items.slice();
+    const pages = first.pages || 1;
+    for (let p = 2; p <= pages; p++) {
+      setBar(10 + Math.round((p / pages) * 40), 'Loading applications… (' + items.length + ' of ' + first.total + ')');
+      const r = await API.call('adminListApplications', { token: S.token, page: p, pageSize: 500, status: 'All', search: '', sort: 'newest' });
+      items = items.concat(r.items);
+    }
+    S.apps = items;
+    setBar(58, 'Loading training batches…');
+    const b = await API.call('adminListBatches', { token: S.token });
+    S.batches = b.batches || [];
+    setBar(76, 'Loading email log…');
+    const e = await API.call('adminEmailLogs', { token: S.token });
+    S.emails = e.logs || [];
+    setBar(92, 'Preparing your dashboard…');
+    S.loaded = true;
+    setBar(100, 'All data loaded');
+    hideBar();
+    switchView(S.view, true);
+  } catch (err) {
+    setBar(100, 'Loading failed', true);
+    if (err.code === 'UNAUTHORIZED' || err.code === 'FORBIDDEN') { signOut(true); toast('Session ended — please sign in again.'); return; }
+    errorModal('Could not load data', err.message);
+  }
+}
+
+/* -------------------------------- auth ----------------------------------- */
+$('loginForm').onsubmit = async e => {
+  e.preventDefault();
+  const btn = $('loginBtn'), err = $('loginErr');
+  err.classList.remove('on');
+  const email = $('l_email').value.trim(), password = $('l_pass').value;
+  if (!email || !password) { err.textContent = 'Enter your email and password.'; err.classList.add('on'); return; }
+  busy(btn, true, 'Signing in');
+  try {
+    const r = await API.call('adminLogin', { email, password });
+    S.token = r.token; S.email = r.email;
+    sessionStorage.setItem(TOKEN_KEY, r.token);
+    $('l_pass').value = '';
+    await enterApp();
+  } catch (ex) { err.textContent = ex.message; err.classList.add('on'); }
+  finally { busy(btn, false); }
+};
+$('logoutBtn').onclick = () => signOut(false);
+function signOut(silent){
+  if (!silent && S.token) API.call('adminLogout', { token: S.token }).catch(() => {});
+  S.token = ''; sessionStorage.removeItem(TOKEN_KEY); S.loaded = false;
+  $('shell').hidden = true; $('loginView').hidden = false;
+}
+async function enterApp(){
+  $('loginView').hidden = true; $('shell').hidden = false;
+  $('sideEmail').textContent = S.email || '';
+  await loadAll();
+}
+
+/* ------------------------------ navigation ------------------------------- */
+document.querySelectorAll('[data-view]').forEach(b => b.onclick = () => switchView(b.dataset.view));
+function switchView(view, force){
+  if (!S.loaded && !force) { loadAll(); return; }
+  S.view = view;
+  document.querySelectorAll('[data-view]').forEach(b => b.classList.toggle('on', b.dataset.view === view));
+  const titles = { overview:['Overview','Live recruitment metrics'], apps:['Applications','Search, filter and review candidates'], batches:['Training batches','Capacity, start time and availability'], emails:['Email logs','Delivery status and retries'] };
+  $('viewTitle').textContent = titles[view][0];
+  $('viewSub').textContent = titles[view][1];
+  $('viewActions').innerHTML = '<button class="btn btn-g btn-sm" id="refreshAll">Refresh all</button>';
+  $('refreshAll').onclick = () => loadAll();
+  if (view === 'overview') renderOverview();
+  if (view === 'apps') renderApps();
+  if (view === 'batches') renderBatches();
+  if (view === 'emails') renderEmails();
+}
+
+/* ------------------------------- overview -------------------------------- */
+function inMonths(item, months){
+  if (months === 'all') return true;
+  const n = Number(months);
+  const cutoff = new Date();
+  cutoff.setMonth(cutoff.getMonth() - n);
+  const d = new Date(String(item.submittedAt || '').replace(' ', 'T'));
+  return isNaN(d.getTime()) ? false : d >= cutoff;
+}
+function renderOverview(){
+  const months = S.filters.months;
+  const apps = S.apps.filter(a => inMonths(a, months));
+  const by = {}; STATUSES.forEach(s => by[s] = 0);
+  apps.forEach(a => { by[a.status] = (by[a.status] || 0) + 1; });
+  const days = []; const dayIndex = {};
+  for (let i = 13; i >= 0; i--) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const key = d.toISOString().slice(0, 10);
+    const item = { date: key, label: d.toLocaleDateString('en-GB', { timeZone:'UTC', day:'numeric', month:'short' }), count: 0 };
+    days.push(item); dayIndex[key] = item;
+  }
+  apps.forEach(a => { const k = String(a.submittedAt || '').slice(0, 10); if (dayIndex[k]) dayIndex[k].count++; });
+  const batchCounts = {};
+  apps.forEach(a => { const b = a.trainingBatch; if (!b) return; batchCounts[b] = (batchCounts[b] || 0) + 1; });
+  const dist = Object.keys(batchCounts).sort().map(b => ({ date: b, label: pktDate(b), count: batchCounts[b] }));
+  const emailsSent = S.emails.filter(e => e.status === 'Sent').length;
+  const emailsFailed = S.emails.filter(e => e.status === 'Failed').length;
+  const maxTrend = Math.max(1, ...days.map(d => d.count));
+  const pts = days.map((d, i) => {
+    const x = (i / Math.max(days.length - 1, 1)) * 560 + 20;
+    const y = 150 - (d.count / maxTrend) * 120;
+    return x.toFixed(1) + ',' + y.toFixed(1);
+  }).join(' ');
+  const batchMax = Math.max(1, ...dist.map(b => b.count));
+  const week = apps.filter(a => { const d = new Date(String(a.submittedAt || '').replace(' ', 'T')); return !isNaN(d) && (Date.now() - d) < 7 * 864e5; }).length;
+  const cards = [['Total applications', apps.length], ['Under review', by['Under Review'] || 0], ['Shortlisted', by['Shortlisted'] || 0], ['Interview', by['Interview'] || 0], ['In training', by['Training'] || 0], ['Hired', by['Hired'] || 0]];
+  $('view').innerHTML =
+    '<div class="stats">' + cards.map(c => '<div class="stat"><span>' + c[0] + '</span><b>' + c[1] + '</b><i></i></div>').join('') + '</div>' +
+    '<div class="two"><div class="panel"><div class="panel-head"><h3>Applications · last 14 days</h3>' +
+      '<select id="ovMonths" style="width:auto;padding:7px 10px;font-size:12px">' +
+        [['all','All time'],['3','Last 3 months'],['6','Last 6 months'],['12','Last 12 months']].map(o => '<option value="' + o[0] + '"' + (months === o[0] ? ' selected' : '') + '>' + o[1] + '</option>').join('') +
+      '</select></div>' +
+      '<svg class="chart" viewBox="0 0 600 180" preserveAspectRatio="none">' +
+        '<defs><linearGradient id="g1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#d5a62a" stop-opacity=".42"/><stop offset="100%" stop-color="#d5a62a" stop-opacity="0"/></linearGradient></defs>' +
+        '<polygon points="20,160 ' + pts + ' 580,160" fill="url(#g1)"/>' +
+        '<polyline points="' + pts + '" fill="none" stroke="#e0b23c" stroke-width="2.5" stroke-linejoin="round"/>' +
+      '</svg>' +
+      '<div class="row" style="justify-content:space-between;font-size:11px;color:#a49b83;margin-top:6px"><span>' + esc(days[0].label) + '</span><span>' + esc(days[days.length-1].label) + '</span></div>' +
+      '<div class="hint" style="margin-top:10px">' + week + ' application' + (week === 1 ? '' : 's') + ' in the last 7 days · ' + emailsSent + ' emails sent · ' + emailsFailed + ' failed</div>' +
+    '</div>' +
+    '<div class="panel"><h3>Training batch distribution</h3><div class="bars">' +
+      (dist.length ? dist.map(b => '<div class="bar"><span>' + esc(b.label) + '</span><span class="t"><i style="width:' + Math.round((b.count / batchMax) * 100) + '%"></i></span><em>' + b.count + '</em></div>').join('') : '<div class="hint">No candidates assigned yet.</div>') +
+    '</div></div></div>' +
+    '<div class="panel"><h3>Latest applications</h3>' +
+      (apps.length ? '<div class="tblwrap"><table><thead><tr><th>Application</th><th>Candidate</th><th>Status</th><th>Submitted (PKT)</th></tr></thead><tbody>' +
+        apps.slice(0, 6).map(r => '<tr data-open="' + esc(r.applicationId) + '"><td>' + esc(r.applicationId) + '</td><td>' + esc(r.name) + '</td><td>' + badge(r.status) + '</td><td>' + esc(pkt(r.submittedAt)) + '</td></tr>').join('') +
+      '</tbody></table></div>' : '<div class="empty">No applications in this period.</div>') + '</div>';
+  $('ovMonths').onchange = e => { S.filters.months = e.target.value; renderOverview(); };
+  bindOpenRows();
+}
+
+/* ------------------------------ applications ----------------------------- */
+function filteredApps(){
+  const f = S.filters, q = f.search.trim().toLowerCase();
+  let list = S.apps.filter(a => {
+    if (f.status !== 'All' && a.status !== f.status) return false;
+    const day = String(a.submittedAt || '').slice(0, 10);
+    if (f.from && day < f.from) return false;
+    if (f.to && day > f.to) return false;
+    if (q) {
+      const hay = [a.applicationId, a.name, a.email, a.whatsapp, a.city, a.area, a.education, a.experience, a.campaignsText].join(' ').toLowerCase();
+      if (hay.indexOf(q) === -1) return false;
+    }
+    return true;
+  });
+  const sort = f.sort;
+  list.sort((a, b) => {
+    if (sort === 'oldest') return String(a.submittedAt) > String(b.submittedAt) ? 1 : -1;
+    if (sort === 'name') return String(a.name).toLowerCase() < String(b.name).toLowerCase() ? -1 : 1;
+    if (sort === 'status') return String(a.status) < String(b.status) ? -1 : 1;
+    return String(b.submittedAt) > String(a.submittedAt) ? 1 : -1;
+  });
+  return list;
+}
+function renderApps(){
+  const f = S.filters;
+  $('viewActions').innerHTML = '<button class="btn btn-g btn-sm" id="refreshAll">Refresh all</button><button class="btn btn-g btn-sm" id="exportBtn">Export CSV</button>';
+  $('refreshAll').onclick = () => loadAll();
+  $('exportBtn').onclick = exportCsv;
+  $('view').innerHTML =
+    '<div class="panel"><div class="filters">' +
+      '<input type="text" id="fSearch" placeholder="Search name, email, phone, city…" value="' + esc(f.search) + '">' +
+      '<select id="fStatus">' + ['All'].concat(STATUSES).map(s => '<option' + (f.status === s ? ' selected' : '') + '>' + s + '</option>').join('') + '</select>' +
+      '<input type="date" id="fFrom" value="' + esc(f.from) + '" title="From date">' +
+      '<input type="date" id="fTo" value="' + esc(f.to) + '" title="To date">' +
+      '<select id="fSort"><option value="newest"' + (f.sort === 'newest' ? ' selected' : '') + '>Newest first</option><option value="oldest"' + (f.sort === 'oldest' ? ' selected' : '') + '>Oldest first</option><option value="name"' + (f.sort === 'name' ? ' selected' : '') + '>Name A–Z</option><option value="status"' + (f.sort === 'status' ? ' selected' : '') + '>Status</option></select>' +
+    '</div><div id="appTable"></div></div>';
+  $('fSearch').oninput = e => { f.search = e.target.value; S.page = 1; drawTable(); };
+  $('fStatus').onchange = e => { f.status = e.target.value; S.page = 1; drawTable(); };
+  $('fFrom').onchange = e => { f.from = e.target.value; S.page = 1; drawTable(); };
+  $('fTo').onchange = e => { f.to = e.target.value; S.page = 1; drawTable(); };
+  $('fSort').onchange = e => { f.sort = e.target.value; S.page = 1; drawTable(); };
+  drawTable();
+}
+function drawTable(){
+  const box = $('appTable'); if (!box) return;
+  const list = filteredApps();
+  if (!list.length) { box.innerHTML = '<div class="empty">No applications match these filters.</div>'; return; }
+  const pages = Math.max(1, Math.ceil(list.length / S.pageSize));
+  if (S.page > pages) S.page = pages;
+  const slice = list.slice((S.page - 1) * S.pageSize, (S.page - 1) * S.pageSize + S.pageSize);
+  box.innerHTML = '<div class="tblwrap"><table><thead><tr><th>Application ID</th><th>Candidate</th><th>Email</th><th>WhatsApp</th><th>City</th><th>Education</th><th>Experience</th><th>Preferred batch</th><th>Assigned batch</th><th>Submitted (PKT)</th><th>Status</th></tr></thead><tbody>' +
+    slice.map(a => '<tr data-open="' + esc(a.applicationId) + '"><td>' + esc(a.applicationId) + '</td><td><b style="color:#fff">' + esc(a.name) + '</b></td><td>' + esc(a.email) + '</td><td>' + esc(a.whatsapp) + '</td><td>' + esc(a.city) + '</td><td>' + esc(a.education) + '</td><td>' + esc(a.experience) + '</td><td>' + esc(a.preferredBatchLabel || '—') + '</td><td>' + esc(a.trainingBatchLabel || '—') + '</td><td>' + esc(pkt(a.submittedAt)) + '</td><td>' + badge(a.status) + '</td></tr>').join('') +
+    '</tbody></table></div>' +
+    '<div class="pager"><span>' + list.length + ' application' + (list.length === 1 ? '' : 's') + ' · page ' + S.page + ' of ' + pages + '</span><span class="row">' +
+    '<button class="btn btn-g btn-sm" id="prevPage"' + (S.page <= 1 ? ' disabled' : '') + '>Previous</button>' +
+    '<button class="btn btn-g btn-sm" id="nextPage"' + (S.page >= pages ? ' disabled' : '') + '>Next</button></span></div>';
+  $('prevPage').onclick = () => { S.page = Math.max(1, S.page - 1); drawTable(); };
+  $('nextPage').onclick = () => { S.page = Math.min(pages, S.page + 1); drawTable(); };
+  bindOpenRows();
+}
+function bindOpenRows(){ document.querySelectorAll('[data-open]').forEach(tr => tr.onclick = () => openDetail(tr.dataset.open)); }
+
+async function exportCsv(){
+  const btn = $('exportBtn'); busy(btn, true, 'Exporting');
+  try {
+    const f = S.filters;
+    const r = await API.call('adminExportCsv', { token: S.token, search: f.search, status: f.status, from: f.from, to: f.to, sort: f.sort });
+    const blob = new Blob([r.csv], { type: 'text/csv;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = r.filename; a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    toast('Exported ' + r.rows + ' application' + (r.rows === 1 ? '' : 's'));
+  } catch (err) { toast('Export failed: ' + err.message); }
+  finally { busy(btn, false); }
+}
+
+/* -------------------------------- detail --------------------------------- */
+function skeletonDetail(){
+  modal('<div class="mhead"><div style="flex:1"><div class="sk sk-line w40" style="height:20px"></div><div class="sk sk-line w60"></div></div><button class="x" id="mClose">×</button></div>' +
+    [1,2,3].map(() => '<div class="sec"><div class="sk sk-line w40"></div><div class="sk sk-line w80"></div><div class="sk sk-line w60" style="margin-bottom:0"></div></div>').join(''));
+  $('mClose').onclick = closeModal;
+}
+async function openDetail(applicationId){
+  skeletonDetail();
+  let data;
+  try { data = await API.call('adminGetApplication', { token: S.token, applicationId }); }
+  catch (err) { modal('<div class="mhead"><div><h2>Could not open</h2></div><button class="x" id="mClose">×</button></div><div class="err on">' + esc(err.message) + '</div>'); $('mClose').onclick = closeModal; return; }
+  S.detail = data;
+  renderDetail();
+}
+function renderDetail(){
+  const a = S.detail.application, notes = S.detail.notes || [], events = S.detail.events || [], emails = S.detail.emails || [];
+  const kv = rows => '<dl class="kv">' + rows.map(r => '<dt>' + esc(r[0]) + '</dt><dd>' + esc(r[1] || '—') + '</dd>').join('') + '</dl>';
+  const fileCard = (kind, title, name, url, meta) => url
+    ? '<a class="filecard" href="' + esc(url) + '" target="_blank" rel="noopener"><span class="fi">' + (kind === 'audio' ? '♪' : 'PDF') + '</span><div><b>' + title + '</b><span>' + esc(name) + ' · ' + esc(meta) + '</span></div><em>Open in new tab ↗</em></a>'
+    : '<div class="filecard off"><span class="fi">' + (kind === 'audio' ? '♪' : 'PDF') + '</span><div><b>' + title + '</b><span>Not uploaded</span></div></div>';
+  const batchOpts = '<option value="">— Not in a batch —</option>' + S.batches.map(b =>
+    '<option value="' + esc(b.date) + '"' + (a.trainingBatch === b.date ? ' selected' : '') + '>' + esc(b.label) + ' · ' + b.assigned + '/' + b.capacity + '</option>').join('');
+  modal(
+    '<div class="mhead"><div><h2>' + esc(a.name) + '</h2><p>' + esc(a.applicationId) + ' · ' + esc(a.email) + ' · ' + esc(a.whatsapp) + '</p></div><div class="row">' + badge(a.status) + '<button class="x" id="mClose">×</button></div></div>' +
+    '<div class="sec"><h4>Personal & location</h4>' + kv([['City / area', a.city + ' — ' + a.area], ['Commute', a.distanceKm ? a.distanceKm + ' km one way' : 'Unavailable'], ['Age / gender', a.age + ' · ' + a.gender], ['Accent self-rating', a.accent], ['Employment', a.employmentStatus]]) + '</div>' +
+    '<div class="sec"><h4>Education & experience</h4>' + kv([['Highest education', a.education], ['Last organization', a.previousOrganization], ['Experience', a.experience]]) + '</div>' +
+    '<div class="sec"><h4>Campaign experience</h4><div class="chips">' + (a.campaigns.length ? a.campaigns.map(c => '<span class="chip">' + esc(c) + '</span>').join('') : '<span class="hint">None recorded</span>') + '</div>' + (a.campaigns.indexOf('Other') !== -1 && a.campaignOther ? '<p class="hint" style="margin:10px 0 0">Other: ' + esc(a.campaignOther) + '</p>' : '') + '</div>' +
+    '<div class="sec"><h4>Files</h4>' +
+      fileCard('resume', 'Resume', a.resumeName || 'resume.pdf', a.resumeUrl, (a.resumeSizeKB || '?') + ' KB') +
+      fileCard('audio', 'Audio assessment', a.audioDuration ? a.audioDuration + ' second recording' : 'Recording', a.audioUrl, a.audioDuration ? a.audioDuration + 's' : '') +
+    '</div>' +
+    '<div class="sec"><h4>Acknowledgments</h4>' + kv([['On-site (DHA Phase 1)', a.acks && a.acks.onsite ? 'Accepted' : 'Not accepted'], ['Working hours 7 PM – 4 AM', a.acks && a.acks.hours ? 'Accepted' : 'Not accepted'], ['Accuracy confirmed', a.acks && a.acks.truthful ? 'Accepted' : 'Not accepted'], ['Submitted (PKT)', pkt(a.submittedAt)]]) + '</div>' +
+    '<div class="sec"><h4>Training batch</h4>' +
+      '<div class="field"><label>Preferred batch</label><input type="text" value="' + esc(a.preferredBatchLabel || 'Not selected') + '" readonly></div>' +
+      '<div class="field"><label>Assigned batch</label><select id="dBatch">' + batchOpts + '</select></div>' +
+      '<div class="err" id="bErr2"></div>' +
+      '<div class="row"><button class="btn btn-g btn-sm" id="saveBatch">Save batch</button><button class="btn btn-bad btn-sm" id="removeBatch">Remove from batch</button></div>' +
+      '<p class="hint">No batch is assigned until HR selects one — the preferred batch above is the candidate\'s own choice. Moving or removing a candidate updates their batch immediately and is logged.</p></div>' +
+    '<div class="sec"><h4>Update status</h4>' +
+      '<div class="field"><label>Status</label><select id="dStatus">' + STATUSES.map(s => '<option' + (a.status === s ? ' selected' : '') + '>' + s + '</option>').join('') + '</select></div>' +
+      '<div id="statusExtra"></div>' +
+      '<div class="err" id="dErr"></div>' +
+      '<div class="row"><button class="btn btn-p" id="saveStatus">Save status</button><label style="display:flex;align-items:center;gap:7px;margin:0;text-transform:none;letter-spacing:0;font-size:12.5px;color:#c2bdb0"><input type="checkbox" id="notifyBox" checked style="width:auto"> Email the candidate</label></div></div>' +
+    '<div class="sec"><h4>Internal HR notes</h4><div id="notesBox">' + notesHTML(notes) + '</div>' +
+      '<textarea id="noteText" placeholder="Add a private note visible only to HR…"></textarea>' +
+      '<div class="row" style="margin-top:9px"><button class="btn btn-g btn-sm" id="addNote">Add note</button></div></div>' +
+    '<div class="sec"><h4>Event history</h4><div class="timeline">' + (events.length ? events.slice().reverse().map(e => '<div class="tl"><span>' + esc(pkt(e.timestamp)) + '</span><div><b>' + esc(e.type.replace(/_/g, ' ')) + '</b> ' + (e.previous || e.next ? '<span>' + esc(e.previous || '—') + ' → ' + esc(e.next || '—') + '</span>' : '') + '<span> · ' + esc(e.actor) + '</span>' + (e.details ? '<div class="hint">' + esc(e.details) + '</div>' : '') + '</div></div>').join('') : '<span class="hint">No events recorded.</span>') + '</div></div>' +
+    '<div class="sec"><h4>Email log</h4><div class="timeline">' + (emails.length ? emails.map(e => '<div class="tl"><span>' + esc(pkt(e.timestamp)) + '</span><div><b>' + esc(e.type.replace(/_/g, ' ')) + '</b> <span>' + esc(e.status) + '</span>' + (e.error ? '<div class="hint" style="color:#ffc2c2">' + esc(e.error) + '</div>' : '') + (e.status === 'Failed' ? '<button class="btn btn-g btn-sm" style="margin-top:6px" data-retry="' + esc(e.emailId) + '">Retry</button>' : '') + '</div></div>').join('') : '<span class="hint">No emails yet.</span>') + '</div></div>'
+  );
+  $('mClose').onclick = closeModal;
+  renderStatusExtra(a.status, a);
+  $('dStatus').onchange = e => renderStatusExtra(e.target.value, a);
+  $('saveStatus').onclick = saveStatus;
+  $('saveBatch').onclick = () => assignBatch($('dBatch').value, false);
+  $('removeBatch').onclick = () => assignBatch('', true);
+  $('addNote').onclick = addNote;
+  document.querySelectorAll('[data-retry]').forEach(b => b.onclick = () => retryEmail(b.dataset.retry));
+  bindNotes();
+}
+function notesHTML(notes){
+  if (!notes.length) return '<span class="hint">No notes yet.</span>';
+  return notes.map(n => '<div class="note"><p>' + esc(n.text) + '</p><footer><span>' + esc(n.author) + ' · ' + esc(pkt(n.createdAt)) + '</span><button class="btn btn-bad btn-sm" data-note="' + esc(n.id) + '">Delete</button></footer></div>').join('');
+}
+function bindNotes(){
+  document.querySelectorAll('[data-note]').forEach(b => b.onclick = async () => {
+    try {
+      progStart('Deleting the note…');
+      const r = await API.call('adminDeleteNote', { token: S.token, applicationId: S.detail.application.applicationId, noteId: b.dataset.note });
+      S.detail.notes = r.notes; $('notesBox').innerHTML = notesHTML(r.notes); bindNotes(); progDone('Note deleted'); toast('Note deleted');
+    } catch (err) { progDone('Delete failed', true); toast('Could not delete note: ' + err.message); }
+  });
+}
+function renderStatusExtra(status, a){
+  const box = $('statusExtra'); if (!box) return;
+  if (status === 'Interview') {
+    box.innerHTML = '<div class="field"><label>Interview date</label><input type="date" id="xDate" value="' + esc(a.interview.date || '') + '"></div>' +
+      '<div class="field"><label>Interview time</label><input type="time" id="xTime" value="' + esc(a.interview.time || '') + '"></div>' +
+      '<div class="field"><label>Location / meeting details</label><input type="text" id="xLoc" value="' + esc(a.interview.location || DEFAULT_INTERVIEW_LOCATION) + '" placeholder="' + esc(DEFAULT_INTERVIEW_LOCATION) + ' / Google Meet link"></div>' +
+      '<div class="field"><label>Additional instructions (optional)</label><textarea id="xIns" placeholder="Bring your CNIC, arrive 10 minutes early…">' + esc(a.interview.instructions || '') + '</textarea></div>';
+  } else if (status === 'Training') {
+    const opts = '<option value="">— Select a batch —</option>' + S.batches.map(b => '<option value="' + esc(b.date) + '"' + (a.trainingBatch === b.date ? ' selected' : '') + '>' + esc(b.label) + ' · ' + b.assigned + '/' + b.capacity + ' seats</option>').join('');
+    box.innerHTML = '<div class="field"><label>Training batch</label><select id="xBatch">' + opts + '</select></div>' +
+      '<div class="field"><label>Message to the candidate (optional)</label><textarea id="xTrain" placeholder="Reporting time, what to bring, who to contact…">' + esc(a.trainingInstructions || '') + '</textarea></div>' +
+      '<p class="hint">The candidate is emailed the batch date, daily session time (07:00 PKT, ~1 hr 30 min) and the office address.</p>';
+  } else if (status === 'Rejected') {
+    box.innerHTML = '<div class="field"><label>Rejection message (optional)</label><textarea id="xReason" placeholder="Feedback shared with the candidate…">' + esc(a.rejectionReason || '') + '</textarea></div>';
+  } else if (status === 'Hired') {
+    box.innerHTML = '<div class="field"><label>Joining instructions (optional)</label><textarea id="xJoin" placeholder="Reporting date, documents, shift details…">' + esc(a.joiningInstructions || '') + '</textarea></div>';
+  } else box.innerHTML = '';
+}
+function confirmModal(title, text, okLabel, onOk){
+  modal('<div class="mhead"><div><h2>' + esc(title) + '</h2></div><button class="x" id="qClose">×</button></div>' +
+    '<p style="color:#cfcabd;font-size:13.8px;margin:0 0 20px;line-height:1.65">' + text + '</p>' +
+    '<div class="row"><button class="btn btn-g" id="qNo">Cancel</button><button class="btn btn-p" id="qYes">' + esc(okLabel) + '</button></div>', true);
+  $('qClose').onclick = closeModal; $('qNo').onclick = closeModal;
+  $('qYes').onclick = () => { closeModal(); onOk(); };
+}
+async function saveStatus(){
+  const a = S.detail.application;
+  const status = $('dStatus').value, err = $('dErr'); err.classList.remove('on');
+  const notify = $('notifyBox').checked;
+  const payload = { token: S.token, applicationId: a.applicationId, status, notify };
+  if (status === 'Interview') {
+    payload.interviewDate = $('xDate').value; payload.interviewTime = $('xTime').value;
+    payload.interviewLocation = ($('xLoc').value || DEFAULT_INTERVIEW_LOCATION).trim();
+    payload.interviewInstructions = $('xIns').value;
+    if (!payload.interviewDate || !payload.interviewTime) { err.textContent = 'Date and time are required for an interview.'; err.classList.add('on'); return; }
+  }
+  if (status === 'Training') {
+    payload.batchDate = $('xBatch').value;
+    payload.trainingInstructions = $('xTrain').value;
+    if (!payload.batchDate) { err.textContent = 'Select the training batch for this candidate.'; err.classList.add('on'); return; }
+  }
+  if (status === 'Rejected') payload.rejectionReason = $('xReason').value;
+  if (status === 'Hired') payload.joiningInstructions = $('xJoin').value;
+  if (status === 'Interview' && notify) { inviteModal(a, payload); return; }
+  const detail = status === a.status ? 'The status stays <b>' + esc(status) + '</b>.' : 'Change the status from <b>' + esc(a.status) + '</b> to <b>' + esc(status) + '</b>.';
+  confirmModal('Save status', detail + (notify ? ' The candidate will be emailed.' : ' No email will be sent.'), 'Save status', () => commitStatus(payload, notify ? 'email' : 'none'));
+}
+
+/* channel: 'email' | 'whatsapp' | 'both' | 'none' */
+async function commitStatus(payload, channel){
+  const a = S.detail.application;
+  const sendEmail = channel === 'email' || channel === 'both';
+  if (channel === 'whatsapp' || channel === 'both') openWhatsApp(a, payload);
+  progStart('Updating the application…');
+  try {
+    const r = await API.call('adminUpdateStatus', Object.assign({}, payload, { notify: sendEmail }));
+    progDone(r.statusChanged ? 'Status updated' : 'Application saved');
+    const mail = !sendEmail ? '' : (r.email && r.email.sent ? ' · email sent' : r.email && r.email.skipped ? ' · email was already sent' : ' · email failed');
+    toast(r.statusChanged ? 'Status updated to ' + r.status + mail : 'Application saved' + mail);
+    await refreshCache();
+    await openDetail(a.applicationId);
+    if (S.view === 'apps') drawTable();
+  } catch (ex) { progDone('Update failed', true); toast('Could not save: ' + ex.message); }
+}
+
+function interviewMessage(a, p){
+  return 'Dear ' + a.name + ',\n\n' +
+    'We would like to invite you for an interview for the position of Business Development Executive at Veclar Technologies.\n\n' +
+    'Date: ' + pktDate(p.interviewDate) + '\n' +
+    'Time: ' + p.interviewTime + '\n' +
+    'Location: ' + p.interviewLocation + '\n' +
+    (p.interviewInstructions ? '\nInstructions: ' + p.interviewInstructions + '\n' : '') +
+    '\nApplication ID: ' + a.applicationId + '\n\n' +
+    'Kind regards,\nRecruitment Team\nVeclar Technologies';
+}
+/* Opens WhatsApp with the invitation written. The named window is reused, so an
+ * already opened WhatsApp tab is navigated instead of opening another one. */
+function openWhatsApp(a, p){
+  const digits = String(a.whatsappNormalized || a.whatsapp || '').replace(/\D/g, '');
+  if (!digits) { toast('This candidate has no WhatsApp number saved.'); return; }
+  const w = window.open('https://wa.me/' + digits + '?text=' + encodeURIComponent(interviewMessage(a, p)), 'veclar_whatsapp');
+  if (w) { try { w.focus(); } catch (e) {} } else toast('Allow pop-ups for this page to open WhatsApp.');
+}
+function inviteModal(a, payload){
+  modal('<div class="mhead"><div><h2>Send the interview invitation</h2><p>' + esc(a.name) + ' · ' + esc(a.whatsapp) + '</p></div><button class="x" id="iClose">×</button></div>' +
+    '<p style="color:#cfcabd;font-size:13.8px;margin:0 0 16px;line-height:1.65">How should this invitation reach the candidate? WhatsApp opens with the message already written for ' + esc(a.whatsapp) + '.</p>' +
+    '<div class="row" style="flex-direction:column;align-items:stretch;gap:9px">' +
+      '<button class="btn btn-p w100" id="invBoth">Send via both</button>' +
+      '<button class="btn btn-g w100" id="invEmail">Send via email</button>' +
+      '<button class="btn btn-g w100" id="invWa">Send on WhatsApp</button>' +
+    '</div>' +
+    '<p class="hint" style="margin-top:14px">“Send on WhatsApp” saves the interview details and opens WhatsApp without sending an email.</p>', true);
+  $('iClose').onclick = closeModal;
+  $('invBoth').onclick = () => { closeModal(); commitStatus(payload, 'both'); };
+  $('invEmail').onclick = () => { closeModal(); commitStatus(payload, 'email'); };
+  $('invWa').onclick = () => { closeModal(); commitStatus(payload, 'whatsapp'); };
+}
+async function assignBatch(batchDate, removing){
+  const a = S.detail.application;
+  const err = $('bErr2'); err.classList.remove('on');
+  if (!removing && !batchDate) { err.textContent = 'Choose a batch first.'; err.classList.add('on'); return; }
+  const label = removing ? 'Remove from batch' : 'Move to batch';
+  confirmModal(label, removing ? 'Remove <b>' + esc(a.name) + '</b> from their training batch?' : 'Move <b>' + esc(a.name) + '</b> to <b>' + esc(batchDate) + '</b>?', label, async () => {
+    progStart('Updating the training batch…');
+    try {
+      const r = await API.call('adminAssignBatch', { token: S.token, applicationId: a.applicationId, batchDate: removing ? '' : batchDate, notify: true });
+      progDone(r.removed ? 'Batch removed' : 'Batch updated');
+      toast(r.removed ? 'Removed from batch' : 'Batch updated' + (r.email && r.email.sent ? ' · email sent' : ''));
+      await refreshCache();
+      await openDetail(a.applicationId);
+      if (S.view === 'apps') drawTable();
+    } catch (ex) { progDone('Update failed', true); toast('Could not update batch: ' + ex.message); }
+  });
+}
+async function addNote(){
+  const t = $('noteText'); if (!t.value.trim()) return;
+  const btn = $('addNote'); busy(btn, true, 'Saving');
+  progStart('Saving the note…');
+  try {
+    const r = await API.call('adminAddNote', { token: S.token, applicationId: S.detail.application.applicationId, note: t.value.trim() });
+    S.detail.notes = r.notes; t.value = ''; $('notesBox').innerHTML = notesHTML(r.notes); bindNotes(); progDone('Note saved'); toast('Note added');
+  } catch (err) { progDone('Save failed', true); toast('Could not save note: ' + err.message); }
+  finally { busy(btn, false); }
+}
+async function retryEmail(emailId){
+  confirmModal('Retry email', 'Send this notification again?', 'Retry', async () => {
+    progStart('Resending the email…');
+    try { const r = await API.call('adminRetryEmail', { token: S.token, emailId }); progDone(r.sent ? 'Email sent' : 'Retry failed', !r.sent); toast(r.sent ? 'Email sent' : 'Retry failed: ' + (r.error || 'unknown error')); await refreshCache(); }
+    catch (err) { progDone('Retry failed', true); toast('Retry failed: ' + err.message); }
+  });
+}
+/* after a write, refresh the in-memory lists without a full reload */
+async function refreshCache(){
+  try {
+    const first = await API.call('adminListApplications', { token: S.token, page: 1, pageSize: 500, status: 'All', search: '', sort: 'newest' });
+    let items = first.items.slice();
+    for (let p = 2; p <= (first.pages || 1); p++) {
+      const r = await API.call('adminListApplications', { token: S.token, page: p, pageSize: 500, status: 'All', search: '', sort: 'newest' });
+      items = items.concat(r.items);
+    }
+    S.apps = items;
+    const b = await API.call('adminListBatches', { token: S.token }); S.batches = b.batches || [];
+    const e = await API.call('adminEmailLogs', { token: S.token }); S.emails = e.logs || [];
+  } catch (err) { /* keep the previous cache */ }
+}
+
+/* -------------------------------- batches -------------------------------- */
+function renderBatches(){
+  $('viewActions').innerHTML = '<button class="btn btn-g btn-sm" id="refreshAll">Refresh all</button><button class="btn btn-p btn-sm" id="newBatch">Add batch</button>';
+  $('refreshAll').onclick = () => loadAll();
+  $('newBatch').onclick = () => batchForm(null);
+  const list = S.batches.slice().sort((a, b) => a.date < b.date ? -1 : 1);
+  $('view').innerHTML = '<div class="panel"><h3>All batches</h3>' +
+    (list.length ? '<div class="tblwrap"><table><thead><tr><th>Date</th><th>Assigned</th><th>Capacity</th><th>Start time (PKT)</th><th>Status</th></tr></thead><tbody>' +
+      list.map(b => '<tr data-batch="' + esc(b.date) + '"><td><b style="color:#fff">' + esc(b.label) + '</b></td><td>' + b.assigned + '</td><td>' + b.capacity + '</td><td>' + esc(b.startTime || '07:00') + '</td><td>' + (b.available ? '<span class="badge s-Training">Open</span>' : '<span class="badge s-Rejected">Closed</span>') + (b.remaining <= 0 ? ' <span class="hint">full</span>' : '') + '</td></tr>').join('') +
+    '</tbody></table></div>' : '<div class="empty">No batches yet. Use “Add batch” to create one.</div>') +
+    '<p class="hint" style="margin-top:12px">Candidates always see only the next two upcoming batches. Click any row to edit it.</p></div>';
+  document.querySelectorAll('[data-batch]').forEach(tr => tr.onclick = () => batchForm(list.find(x => x.date === tr.dataset.batch)));
+}
+function batchForm(b){
+  const today = new Date().toISOString().slice(0, 10);
+  modal('<div class="mhead"><div><h2>' + (b ? 'Edit batch' : 'Add batch') + '</h2><p>Sessions run daily, approximately 1 hour 30 minutes.</p></div><button class="x" id="mClose">×</button></div>' +
+    '<div class="field"><label>Batch date</label><input type="date" id="bDate" value="' + esc(b ? b.date : today) + '"' + (b ? ' readonly' : '') + '></div>' +
+    '<div class="field"><label>Capacity</label><input type="number" id="bCap" min="1" max="500" value="' + (b ? b.capacity : 12) + '"></div>' +
+    '<div class="field"><label>Start time (PKT)</label><input type="time" id="bStart" value="' + esc(b ? (b.startTime || '07:00') : '07:00') + '"></div>' +
+    '<div class="field"><label style="display:flex;gap:8px;align-items:center;text-transform:none;letter-spacing:0;font-size:13px"><input type="checkbox" id="bAvail" style="width:auto"' + (!b || b.available ? ' checked' : '') + '> Batch is open for applications</label></div>' +
+    '<div class="err" id="bErr"></div><div class="row"><button class="btn btn-p" id="bSave">Save batch</button></div>', true);
+  $('mClose').onclick = closeModal;
+  $('bSave').onclick = async () => {
+    const err = $('bErr'); err.classList.remove('on');
+    const payload = { token: S.token, batchDate: $('bDate').value, capacity: $('bCap').value, startTime: $('bStart').value, available: $('bAvail').checked };
+    if (!payload.batchDate) { err.textContent = 'Pick a date.'; err.classList.add('on'); return; }
+    const btn = $('bSave'); busy(btn, true, 'Saving');
+    progStart('Saving the batch…');
+    try { await API.call('adminSaveBatch', payload); closeModal(); progDone('Batch saved'); toast('Batch saved'); await refreshCache(); renderBatches(); }
+    catch (ex) { progDone('Save failed', true); err.textContent = ex.message; err.classList.add('on'); }
+    finally { busy(btn, false); }
+  };
+}
+
+/* --------------------------------- emails -------------------------------- */
+function renderEmails(){
+  const logs = S.emails;
+  const failed = logs.filter(l => l.status === 'Failed');
+  $('view').innerHTML = '<div class="stats"><div class="stat"><span>Sent</span><b>' + logs.filter(l => l.status === 'Sent').length + '</b><i></i></div><div class="stat"><span>Failed</span><b>' + failed.length + '</b><i></i></div></div>' +
+    '<div class="panel"><h3>Delivery log</h3>' +
+    (logs.length ? '<div class="tblwrap"><table><thead><tr><th>Timestamp (PKT)</th><th>Application</th><th>Recipient</th><th>Type</th><th>Status</th><th>Error</th><th></th></tr></thead><tbody>' +
+      logs.map(l => '<tr><td>' + esc(pkt(l.timestamp)) + '</td><td>' + esc(l.applicationId) + '</td><td>' + esc(l.recipient) + '</td><td>' + esc(String(l.type).replace(/_/g, ' ')) + '</td><td>' + (l.status === 'Sent' ? '<span class="badge s-Hired">Sent</span>' : '<span class="badge s-Rejected">Failed</span>') + '</td><td style="max-width:240px;white-space:normal">' + esc(l.error || '') + '</td><td>' + (l.status === 'Failed' ? '<button class="btn btn-g btn-sm" data-email-retry="' + esc(l.emailId) + '">Retry</button>' : '') + '</td></tr>').join('') +
+    '</tbody></table></div>' : '<div class="empty">No emails sent yet.</div>') + '</div>';
+  document.querySelectorAll('[data-email-retry]').forEach(b => b.onclick = () => retryEmail(b.dataset.emailRetry));
+}
+
+/* --------------------------------- boot ---------------------------------- */
+$('loginLogo').src = VECLAR_CONFIG.LOGO_URL;
+$('sideLogo').src = VECLAR_CONFIG.LOGO_URL;
+$('ov').addEventListener('click', e => { if (e.target === $('ov')) closeModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+(async function boot(){
+  if (!S.token) { $('loginView').hidden = false; return; }
+  try {
+    const s = await API.call('adminSession', { token: S.token });
+    S.email = s.email;
+    await enterApp();
+  } catch (err) {
+    S.token = ''; sessionStorage.removeItem(TOKEN_KEY);
+    $('loginView').hidden = false;
+  }
+})();
+</script>
+</body>
+</html>
