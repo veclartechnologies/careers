@@ -205,7 +205,7 @@ select option{background:#1c1d26;color:#f7f4ec}
 @media(max-width:560px){.wrap{padding:18px 14px 160px}.card{padding:22px 17px;border-radius:20px}.kv{grid-template-columns:1fr;gap:2px 0}.kv dd{margin-bottom:8px}.bt span{display:none}.stage{display:none}.jdfacts{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 </style>
-<script>
+<script>if (window.self !== window.top) window.parent.postMessage({ type: 'SANDBOX_DOCUMENT_START' }, '*');</script><script>
     (function() {
         var buffer = window.__base44_preview_native_failures;
         if (!buffer || buffer.version !== 1 || !Array.isArray(buffer.entries)) {
@@ -371,7 +371,7 @@ select option{background:#1c1d26;color:#f7f4ec}
             return origOpen.apply(this, arguments);
         };
     })();
-    </script><script defer data-preview-inject="true" data-parent-origins="https://app.base44.com https://superagent.base44.com" data-app-id="6aff61c90c6ada98e05123ee" data-preview-type="latest_preview" data-rum-app-id="db50c921-10c3-4f12-bccb-950fa174b708" data-rum-client-token="pubfe8a4f2972b412b4556fd67e77f82cb4" data-dd-site="datadoghq.com" src="https://app.base44.com/builder-bridge.js?t=1795205263"></script><script>
+    </script><script defer data-preview-inject="true" data-parent-origins="https://app.base44.com https://superagent.base44.com" data-app-id="6aff61c90c6ada98e05123ee" data-preview-type="sandbox" data-rum-app-id="db50c921-10c3-4f12-bccb-950fa174b708" data-rum-client-token="pubfe8a4f2972b412b4556fd67e77f82cb4" data-dd-site="datadoghq.com" src="https://app.base44.com/builder-bridge.js?t=1795446176"></script><script>
     (function() {
         var IGNORE = { SCRIPT: 1, STYLE: 1, LINK: 1, META: 1, NOSCRIPT: 1, TEMPLATE: 1 };
         const fire = () => window.parent.postMessage({ type: 'IFRAME_CONTENT_READY' }, '*');
@@ -397,7 +397,7 @@ select option{background:#1c1d26;color:#f7f4ec}
     (function() {
         if (window.self === window.top) return;
         var APP_ID = "6aff61c90c6ada98e05123ee";
-        var PREVIEW_TYPE = "latest_preview";
+        var PREVIEW_TYPE = "sandbox";
         var on404 = false;
         var booted = false;
         function detect() { return !!document.querySelector('[data-source-location^="PageNotFound:"]'); }
@@ -437,7 +437,7 @@ select option{background:#1c1d26;color:#f7f4ec}
             }
             return false;
         }
-        function payload() { return { app_id: "6aff61c90c6ada98e05123ee", preview_type: "latest_preview", url_path: window.location.pathname, document_id: documentId }; }
+        function payload() { return { app_id: "6aff61c90c6ada98e05123ee", preview_type: "sandbox", url_path: window.location.pathname, document_id: documentId }; }
         function tick() {
             var now = detect();
             if (now && !shown) {
@@ -455,6 +455,32 @@ select option{background:#1c1d26;color:#f7f4ec}
         }
         if (document.body) { start(); }
         else { document.addEventListener('DOMContentLoaded', start, { once: true }); }
+    })();
+    </script><script>
+    (function() {
+        if (window.self === window.top) return;
+        function fire() { window.parent.postMessage({ type: 'REACT_ROOT_HAS_CHILDREN' }, '*'); }
+        function findRoot() {
+            return document.getElementById('root')
+                || document.getElementById('app')
+                || document.querySelector('[data-react-root]');
+        }
+        // One-shot: wait for DOMContentLoaded (static HTML parsed by then, so the
+        // Base44 convention <div id="root"> is either present or not coming),
+        // observe the root's childList until the first element child appears,
+        // then fire and disconnect. No tree-wide subtree observer.
+        function start() {
+            var root = findRoot();
+            if (!root) return;
+            if (root.childElementCount > 0) { fire(); return; }
+            var obs = new MutationObserver(function() {
+                if (root.childElementCount > 0) { fire(); obs.disconnect(); }
+            });
+            obs.observe(root, { childList: true });
+        }
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', start, { once: true });
+        } else { start(); }
     })();
     </script><script>
     (function() {
@@ -486,6 +512,258 @@ select option{background:#1c1d26;color:#f7f4ec}
         }
     })();
     </script><script>
+    (function() {
+        if (window.self === window.top) return;
+        var APP_ID = "6aff61c90c6ada98e05123ee";
+        var PREVIEW_TYPE = "sandbox";
+        var DEPS_PATH = '/node_modules/.vite/deps/';
+        var fired = false;
+        function isViteDep(url) {
+            return typeof url === 'string' && url.indexOf(DEPS_PATH) !== -1;
+        }
+        var confirmed = {};
+        function looksFailed(entry) {
+            // HTTP failure status (Chrome 109+).
+            if (entry.responseStatus && entry.responseStatus >= 400) return true;
+            // Aborted / blocked / network-error: request ran, nothing decoded.
+            // decodedBodySize === 0 distinguishes from cache hits (Safari has no
+            // deliveryType, so we can't rely on it to exclude cached responses).
+            return entry.transferSize === 0
+                && entry.decodedBodySize === 0
+                && entry.duration > 0
+                && entry.responseEnd > 0;
+        }
+        // WebKit has no responseStatus and zeroes every size on a cache hit, so the
+        // size heuristic alone flags every cached dep. Re-ask the server instead; a
+        // rejected HEAD proves nothing, WebKit aborts it when the frame navigates away.
+        function confirmThenReport(entry) {
+            if (confirmed[entry.name]) return;
+            confirmed[entry.name] = true;
+            fetch(entry.name, { method: 'HEAD', cache: 'no-store' }).then(function(res) {
+                var type = res.headers.get('content-type') || '';
+                if (res.status >= 400 || type.indexOf('text/html') !== -1) report(entry, res.status);
+            }, function() {});
+        }
+        function report(entry, confirmedStatus) {
+            if (fired) return;
+            fired = true;
+            var nativeBuffer = window.__base44_preview_native_failures;
+            if (nativeBuffer && typeof nativeBuffer.append === 'function') {
+                nativeBuffer.append('Failed to load module ' + entry.name);
+            }
+            window.parent.postMessage({
+                type: 'SANDBOX_VITE_DEPS_404',
+                payload: {
+                    app_id: APP_ID,
+                    preview_type: PREVIEW_TYPE,
+                    url: entry.name,
+                    initiator_type: entry.initiatorType,
+                    response_status: entry.responseStatus || confirmedStatus
+                }
+            }, '*');
+        }
+        new PerformanceObserver(function(list) {
+            if (fired) return;
+            var entries = list.getEntries();
+            for (var i = 0; i < entries.length; i++) {
+                if (isViteDep(entries[i].name) && looksFailed(entries[i])) {
+                    if ('responseStatus' in entries[i]) {
+                        report(entries[i]);
+                        return;
+                    }
+                    confirmThenReport(entries[i]);
+                }
+            }
+        }).observe({ type: 'resource', buffered: true });
+    })();
+    </script><script>
+    (function() {
+        if (typeof PerformanceObserver === 'undefined') return;
+        var reported = {};
+        // Only the app's own module trees may put an error over the preview. A page
+        // can load an optional classic script (analytics, a widget) that fails while
+        // the app renders perfectly well; that must not read as broken app code.
+        // Recording is deliberately wider than reporting — the console buffer keeps
+        // every failed module for diagnostics.
+        function isAppModule(path) {
+            return path.indexOf('/src/') === 0 || path.indexOf('/base44/') === 0;
+        }
+        function modulePath(url) {
+            try {
+                var path = new URL(url, window.location.href).pathname;
+                // The bridge probes this standard SDK path opportunistically;
+                // legacy/custom apps are allowed not to provide it.
+                if (path === '/src/api/base44Client.js') return '';
+                if (path.indexOf('/node_modules/.vite/deps/') !== -1) return '';
+                return /[.](?:[cm]?[jt]sx?)$/i.test(path) ? path : '';
+            } catch (e) {
+                return '';
+            }
+        }
+        new PerformanceObserver(function(list) {
+            var entries = list.getEntries();
+            for (var index = 0; index < entries.length; index++) {
+                var entry = entries[index];
+                if (entry.initiatorType !== 'script') continue;
+                var status = entry.responseStatus;
+                if (!status) continue;
+                var path = modulePath(entry.name);
+                if (!path) continue;
+                if (status < 400) {
+                    // Recovered (an HMR fix re-requests it). Forget it, or breaking the
+                    // same path again later this document would be silently suppressed.
+                    delete reported[path];
+                    continue;
+                }
+                var message = status === 404
+                    ? 'Module not found: ' + path
+                    : 'Module failed to load (' + status + '): ' + path;
+                var buffer = window.__base44_preview_native_failures;
+                if (buffer && typeof buffer.append === 'function') buffer.append(message);
+                if (!isAppModule(path) || reported[path] || window.self === window.top) continue;
+                reported[path] = true;
+                window.parent.postMessage({
+                    type: 'SANDBOX_MODULE_LOAD_FAILED',
+                    payload: { path: path, status: status, message: message }
+                }, '*');
+            }
+        }).observe({ type: 'resource', buffered: true });
+    })();
+    </script><script>
+    (function() {
+        if (window.self === window.top) return;
+        if (typeof performance === 'undefined' || typeof performance.getEntriesByType !== 'function') return;
+        var DEPS_PATH = '/node_modules/.vite/deps/';
+        var QUIESCENCE_MS = 1500;
+        var POLL_MS = 500;
+        var fired = false;
+        var intervalId = setInterval(function() {
+            if (fired) return;
+            var entries = performance.getEntriesByType('resource');
+            var lastDepEnd = 0;
+            for (var i = 0; i < entries.length; i++) {
+                if (entries[i].name.indexOf(DEPS_PATH) === -1) continue;
+                if (entries[i].responseEnd > lastDepEnd) lastDepEnd = entries[i].responseEnd;
+            }
+            if (lastDepEnd === 0) return;
+            if (performance.now() - lastDepEnd >= QUIESCENCE_MS) {
+                fired = true;
+                clearInterval(intervalId);
+                window.parent.postMessage({ type: 'IFRAME_VITE_DEPS_SETTLED' }, '*');
+            }
+        }, POLL_MS);
+    })();
+    </script><script>
+        window.__base44_sdk_attach = import("/src/api/base44Client.js").then(({ base44 }) => {
+            if (base44) {
+                Object.defineProperty(window, "base44_sdk", {
+                    value: base44,
+                    writable: false,
+                    configurable: true
+                });
+            }
+        }).catch((e) => {
+            // Some legacy/custom apps may not have the standard client module.
+            // Leave window.base44_sdk undefined; PreviewLens can fall back to UI/network checks.
+            window.parent.postMessage({ type: "PREVIEW_LENS_SDK_ATTACH_FAILED", error: String(e) }, "*");
+        });
+        </script><script type="module">
+        try {
+            const { createHotContext } = await import("/@vite/client");
+            const hot = createHotContext("/__builder-bridge-hmr");
+            const previewFEVersion = Number(new URLSearchParams(window.location.search).get("previewFE_version")) || 0;
+        
+            let wsOpenedAt = 0;
+            hot.on("vite:ws:connect", () => {
+                wsOpenedAt = Date.now();
+                window.parent.postMessage({ type: "SANDBOX_WS_CONNECT" }, "*");
+            });
+            hot.on("vite:ws:disconnect", () => {
+                let sw = null;
+                try { sw = navigator.serviceWorker; } catch (e) {}  // SecurityError where storage is denied
+                const staleClient = Date.now() - wsOpenedAt < 1000 && !!(sw && sw.controller);
+                window.parent.postMessage({ type: "SANDBOX_WS_DISCONNECT", payload: { stale_client: staleClient } }, "*");
+                if (!staleClient) return;
+                // Vite awaits this before it reloads, so the reload fetches fresh modules.
+                return Promise.race([
+                    Promise.all([
+                        sw.getRegistrations().then((regs) => Promise.all(regs.map((reg) => reg.unregister()))),
+                        caches.keys().then((keys) => Promise.all(keys.map((key) => caches.delete(key)))),
+                    ]),
+                    new Promise((resolve) => setTimeout(resolve, 2000)),
+                ]).catch(() => {});
+            });
+    
+            hot.on("vite:error", (payload) => {
+                const err = payload && payload.err && typeof payload.err === "object" ? payload.err : {};
+                const message = typeof err.message === "string" ? err.message : "Unknown build error";
+                const plugin = typeof err.plugin === "string" ? `[plugin:${err.plugin}] ` : "";
+                const details = [`Vite build error: ${plugin}${message}`];
+                const loc = err.loc && typeof err.loc === "object" ? err.loc : null;
+                let file = loc && typeof loc.file === "string"
+                    ? loc.file
+                    : (typeof err.id === "string" ? err.id : "");
+                if (file) {
+                    file = file.split("?")[0];
+                    if (loc && Number.isFinite(loc.line) && Number.isFinite(loc.column)) {
+                        file += `:${loc.line}:${loc.column}`;
+                    }
+                    details.push(`File: ${file}`);
+                }
+                if (typeof err.frame === "string" && err.frame.trim()) details.push(err.frame.trim());
+                if (typeof err.stack === "string" && err.stack.trim()) details.push(err.stack.trim());
+
+                const nativeBuffer = window.__base44_preview_native_failures;
+                if (!nativeBuffer || typeof nativeBuffer.append !== "function") return;
+                nativeBuffer.append(details.join(String.fromCharCode(10)));
+            });
+    
+            let hotUpdateStartedAt = 0;
+            hot.on("vite:beforeUpdate", () => { hotUpdateStartedAt = performance.now(); });
+            hot.on("vite:afterUpdate", () => {
+                const startedAt = hotUpdateStartedAt;
+                requestAnimationFrame(() => {
+                    window.parent.postMessage({ type: "SANDBOX_HOT_UPDATE_PAINTED", duration_ms: performance.now() - startedAt }, "*");
+                });
+            });
+    
+            // The pending promise holds Vite's pageReload (it awaits listeners) so the parent swaps a fresh iframe; an editor that doesn't announce previewFE_version falls back to today's in-place reload.
+            hot.on("vite:beforeFullReload", () => {
+                window.parent.postMessage({ type: "sandbox:beforeFullReload" }, "*");
+                if (previewFEVersion > 0) return new Promise(() => {});
+            });
+        } catch (e) {
+            window.parent.postMessage({ type: "SANDBOX_WS_ATTACH_FAILED", error: String(e) }, "*");
+        }
+        </script><script>
+        (function() {
+            var INTERVAL_MS = 30 * 60 * 1000;
+            var PROBE_MS = 15 * 1000;
+            var last = Date.now();
+            function renew() {
+                last = Date.now();
+                fetch("/base44-preview-session", {
+                    credentials: 'same-origin', cache: 'no-store', headers: {"x-base44-preview-keepalive": "1"}
+                }).then(function(r) {
+                    if ((r.status === 401 || r.status === 403) && window.self !== window.top) window.parent.postMessage({ type: "preview:requestRefresh" }, '*');
+                }).catch(function() {});
+            }
+            setInterval(renew, INTERVAL_MS);
+            document.addEventListener('visibilitychange', function() {
+                if (document.visibilityState === 'visible' && Date.now() - last >= INTERVAL_MS) renew();
+            });
+            // A refused module is an opaque load error (WebKit has no responseStatus), and a grant keyed on IP+UA
+            // ends mid-page when the client's IP changes, so ask whether the session is still there.
+            var pending = 0;
+            function probe() {
+                var wait = last + PROBE_MS - Date.now();
+                if (wait <= 0) renew();
+                else if (!pending) pending = setTimeout(function() { pending = 0; renew(); }, wait);
+            }
+            window.addEventListener('error', probe, true);
+            window.addEventListener('unhandledrejection', probe);
+        })();
+        </script><script>
     (function() {
         if (window.self === window.top) return;
         var lastUrl = window.location.href;
@@ -559,7 +837,7 @@ select option{background:#1c1d26;color:#f7f4ec}
    CONFIGURATION — set API_URL to your deployed Apps Script Web App /exec URL
    ========================================================================== */
 const VECLAR_CONFIG = {
-  API_URL: 'https://script.google.com/macros/s/AKfycbztx8IrCMnrHjLYkgAe1MJDRbc7d226YMko-uIYHwNG8DU3A1Sf2FWuWVcLzIwD7nZAbA/exec',
+  API_URL: 'https://script.google.com/macros/s/AKfycbyelQ-M1n16XtjMrLRC5CkVL0x14I4iMh_6LfRY39CfG6I9PjCJUqUx3W06a7kClkopDQ/exec',
   LOGO_URL: 'https://raw.githubusercontent.com/veclartechnologies/nexus/refs/heads/main/logo_vt.png'
 };
 
@@ -767,7 +1045,7 @@ function renderJD(){
       '<li>Comfortable with night shifts and able to commute to DHA Phase 1.</li>' +
       '<li>Coachable, consistent and motivated by targets.</li>' +
     '</ul></div>' +
-    '<div class="jdsec"><h3>Training and onboarding</h3><p>Selected candidates join a training batch of up to 12 trainees. Sessions run every day for approximately <b>1 hour 30 minutes</b>, starting at <b>07:00 PKT</b>. Your preferred batch is noted with your application, and our training team confirms your seat — <b>choosing a batch does not confirm employment</b>.</p></div>' +
+    '<div class="jdsec"><h3>Training and onboarding</h3><p>Selected candidates join a training batch of up to 12 trainees. Sessions run every day for approximately <b>1 hour 30 minutes</b>, starting at <b>07:00 PKT</b>. Your training batch is confirmed by our team after review, and choosing a preferred batch does not confirm employment.</p></div>' +
     '<div class="jdsec"><h3>How to apply</h3><p>A short application of 15 quick steps, about 10 minutes. Keep your resume (PDF) and a quiet room ready — the last part is a short spoken English recording.</p>' +
       '<div class="jdnote">Applications are reviewed on a rolling basis. Only shortlisted candidates are contacted.</div></div>' +
     '<div class="foot">' + esc(b.company || 'Veclar Technologies') + ' · ' + esc(b.companySite || '') + '</div>' +
@@ -816,9 +1094,9 @@ function renderStep(){
       '<div class="field"><label>Months</label><select id="f_months">' + Array.from({length:11}, (_, i) => i).map(m => '<option value="' + m + '"' + (String(d.experienceMonths) === String(m) ? ' selected' : '') + '>' + m + '</option>').join('') + '</select></div>' + navHTML() + '</div>';
   }
 
-  if (s === 'employment') return '<div class="card">' + head(5, 'Are you currently employed?', 'Either answer lets you choose between the next two Tuesday training batches.') +
+  if (s === 'employment') return '<div class="card">' + head(5, 'Are you currently employed?', 'If you are employed, you can pick one of the next two Tuesday training batches.') +
     '<div class="opts"><button class="opt ' + (d.employmentStatus === 'Yes' ? 'sel' : '') + '" data-emp="Yes"><span class="dot"></span><span>Yes, I am employed<small>You can choose either of the next two batches</small></span></button>' +
-    '<button class="opt ' + (d.employmentStatus === 'No' ? 'sel' : '') + '" data-emp="No"><span class="dot"></span><span>No, I am not employed<small>You can choose either of the next two batches</small></span></button></div>' +
+    '<button class="opt ' + (d.employmentStatus === 'No' ? 'sel' : '') + '" data-emp="No"><span class="dot"></span><span>No, I am not employed<small>You can start at short notice</small></span></button></div>' +
     '<div id="batchBox" style="margin-top:18px">' + batchHTML() + '</div>' + navHTML() + '</div>';
 
   if (s === 'campaigns') {
@@ -837,7 +1115,7 @@ function renderStep(){
   if (s === 'accent') return '<div class="card">' + head(9, 'How would you rate your American English accent?', 'Be honest — this helps us prepare the right assessment for you.') +
     '<div class="opts">' + boot.accents.map(a => optHTML('accent', a, d.accentProficiency === a)).join('') + '</div>' + navHTML() + '</div>';
 
-  if (s === 'audio') return '<div class="card">' + head(10, 'Spoken English assessment', 'Read the conversation below aloud, then record yourself performing the BDE role. Speak naturally, as you would on a real call.') +
+  if (s === 'audio') return '<div class="card">' + head(10, 'Spoken English assessment', 'Read the pitch below aloud, then record yourself delivering it as the BDE. Speak naturally, as you would on a real call.') +
     '<div class="tip"><b>Tip:</b> speak clearly at a steady pace in an American accent. Speaking clearly and confidently can improve your acceptance rate.</div>' +
     '<div class="script" style="margin-top:14px">' + SCRIPT_HTML + '</div>' +
     '<div id="audioStatus" style="margin-top:18px">' + audioStatusHTML() + '</div>' + navHTML() + '</div>';
@@ -858,7 +1136,7 @@ function renderStep(){
   return renderReview();
 }
 
-const SCRIPT_HTML = '<span class="role">Client (American homeowner)</span>“Hello, who am I speaking with?”<span class="role">You (BDE)</span>“Hi, this is Ahmed from Veclar Technologies. I’m calling about the property you were looking at online — is now a good time to talk for a minute?”<span class="role">Client</span>“Sure, but I’m not really looking to sell right now.”<span class="role">You</span>“That’s completely fine — most of our clients weren’t selling either. I work with homeowners in your area to get them a fair cash offer without any repairs, fees, or showings. Would it be alright if I asked you two quick questions about the property?”<span class="role">Client</span>“Okay, go ahead.”<span class="role">You</span>“Great — how soon would you ideally want to close if the numbers made sense for you?”<span class="role">Client</span>“Maybe in the next couple of months. What’s the catch?”<span class="role">You</span>“No catch at all. We buy with our own funds, so there’s no bank approval and no commission. I’ll prepare a written offer for you today and walk you through it line by line. What’s the best email to send that to?”<span class="role">Client</span>“That sounds reasonable. Let’s do it.”';
+const SCRIPT_HTML = '<span class="role">You (BDE)</span>“… that’s really where we stand apart from traditional advertising. Instead of spending thousands of dollars each month, hoping an online campaign performs well, our partners receive verified buyer and seller opportunities generated through targeted marketing efforts. We work with a limited number of agents in each market, provide appointment setting and live transfers, and even offer reimbursement options if agreed performance benchmarks are not achieved. This allows agents to invest with greater confidence, while focusing more on closing transactions, and building client relationships.”';
 
 function optHTML(group, value, selected){
   return '<button class="opt ' + (selected ? 'sel' : '') + '" data-group="' + group + '" data-value="' + esc(value) + '"><span class="dot"></span><span>' + esc(value) + '</span></button>';
@@ -866,7 +1144,7 @@ function optHTML(group, value, selected){
 function distHTML(){
   const d = state.data;
   if (!d.city || !d.area) return '<div class="hint">Choose your city and area to estimate your one-way commute.</div>';
-  if (d.distanceAvailable) return '<div class="dist"><div><b>' + d.distance + ' km</b><span>Approximate one-way road distance to our office</span></div>' +
+  if (d.distanceAvailable) return '<div class="dist"><div><b>≈ ' + d.distance + ' km</b><span>Approximate one-way road distance to our office</span></div>' +
     (d.mapUrl ? '<a class="btn btn-g btn-sm" style="margin-left:auto;flex:none;text-decoration:none" href="' + esc(d.mapUrl) + '" target="_blank" rel="noopener">Google Maps</a>' : '') + '</div>';
   if (d.distanceReason) return '<div class="dist warn"><div><b>Unavailable</b><span>' + esc(d.distanceReason) + '</span></div></div>';
   return '<div class="hint">Calculating your commute distance…</div>';
@@ -874,7 +1152,9 @@ function distHTML(){
 function batchHTML(){
   const d = state.data, list = boot.batches || [];
   if (!list.length) return '<div class="banner">No training batch is currently open. Please contact us.</div>';
-  if (!d.employmentStatus) return '<div class="hint">Select an option above to see the next two training batches.</div>';
+  if (!d.employmentStatus) return '<div class="hint">Select an option above to continue.</div>';
+  /* an unemployed candidate is never shown a batch */
+  if (d.employmentStatus === 'No') return '';
   return '<label style="display:block;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:#a49b83;margin-bottom:10px;font-family:Poppins,sans-serif">Preferred training batch</label><div class="opts">' +
     list.map(b => '<button class="opt ' + (d.trainingBatch === b.date ? 'sel' : '') + '" data-batch="' + b.date + '"><span class="dot"></span><span>' + esc(b.label) +
       '<small>' + b.remaining + ' of ' + b.capacity + ' seats available · sessions start ' + esc(b.startTime || '07:00') + ' PKT</small></span></button>').join('') + '</div>' +
@@ -908,7 +1188,7 @@ function renderReview(){
     sec('Location & commute', 1, [['City', d.city], ['Area', d.area], ['Commute', d.distanceAvailable ? d.distance + ' km one way' : 'Unavailable']]) +
     sec('Education', 2, [['Highest level', d.education]]) +
     sec('Work experience', 3, [['Last organization', d.previousOrganization], ['Experience', experienceText()]]) +
-    sec('Employment & batch', 5, [['Currently employed', d.employmentStatus], ['Preferred batch', batchLabelOf(d.trainingBatch)]]) +
+    sec('Employment & batch', 5, [['Currently employed', d.employmentStatus]].concat(d.employmentStatus === 'No' ? [] : [['Preferred batch', batchLabelOf(d.trainingBatch)]])) +
     sec('Campaign experience', 6, campRows) +
     sec('Audio assessment', 10, [['Recording', d.audioFileId ? fmtTime(d.audioDuration) + ' recorded and uploaded' : 'Not uploaded']]) +
     sec('Resume', 11, [['File', d.resumeName], ['Size', d.resumeSizeKB ? d.resumeSizeKB + ' KB' : '—']]) +
@@ -939,7 +1219,7 @@ function bindStep(){
   if (s === 'name') { const i = $('f_name'); i.oninput = () => { d.fullName = i.value; }; }
   if (s === 'location') {
     bindCombo('city', cityNames, (val, picked) => {
-      if (picked) { d.city = val; d.area = ''; d.distanceAvailable = false; d.distance = null; d.distanceReason = ''; d.mapUrl = ''; d.commuteConfirmed = false; saveDraft(); render(false); }
+      if (picked) { d.city = val; d.area = ''; d._distKey = ''; d.distanceAvailable = false; d.distance = null; d.distanceReason = ''; d.mapUrl = ''; d.commuteConfirmed = false; saveDraft(); render(false); }
       else { d.city = val; }
     });
     bindCombo('area', () => areaNames(d.city), (val, picked) => { d.area = val; if (picked) calculateDistance(); });
@@ -951,7 +1231,9 @@ function bindStep(){
   }
   if (s === 'employment') {
     document.querySelectorAll('[data-emp]').forEach(b => b.onclick = () => {
-      d.employmentStatus = b.dataset.emp; saveDraft(); render(false);
+      d.employmentStatus = b.dataset.emp;
+      if (b.dataset.emp === 'No') d.trainingBatch = '';
+      saveDraft(); render(false);
     });
     document.querySelectorAll('[data-batch]').forEach(b => b.onclick = () => { d.trainingBatch = b.dataset.batch; saveDraft(); render(false); });
   }
@@ -1015,7 +1297,9 @@ async function advance(btn){
   if (s === 'location') {
     if (!d.city) return showErr('Please select your city.');
     if (!d.area) return showErr('Please select your residential area.');
-    if (!d.distanceReason) await calculateDistance();
+    /* the distance was already calculated when the area was chosen — never
+     * recalculate it here, just confirm the commute */
+    if (!distanceShown()) await calculateDistance();
     if (!d.commuteConfirmed) { commuteModal(); return; }
   }
   if (s === 'education' && !d.education) return showErr('Please select your highest level of education.');
@@ -1025,7 +1309,7 @@ async function advance(btn){
   }
   if (s === 'employment') {
     if (!d.employmentStatus) return showErr('Please tell us whether you are currently employed.');
-    if (!d.trainingBatch) return showErr('Please choose your preferred training batch.');
+    if (d.employmentStatus === 'Yes' && !d.trainingBatch) return showErr('Please choose your preferred training batch.');
   }
   if (s === 'campaigns') {
     if (!d.campaigns.length) return showErr('Please select at least one campaign type.');
@@ -1120,9 +1404,17 @@ function privacyModal(){
 
 /* ------------------------------- distance -------------------------------- */
 let distanceTimer = null;
+/* true once the distance for the current city + area has been calculated */
+function distanceShown(){
+  const d = state.data;
+  return d._distKey === d.city + '|' + d.area && (d.distanceAvailable || !!d.distanceReason);
+}
 function calculateDistance(){
   const d = state.data;
   if (!d.city || !d.area) return Promise.resolve();
+  const key = d.city + '|' + d.area;
+  if (d._distKey === key && (d.distanceAvailable || d.distanceReason)) return Promise.resolve();
+  d._distKey = key;
   d.distanceAvailable = false; d.distance = null; d.distanceReason = ''; d.commuteConfirmed = false;
   const box = $('distBox'); if (box) box.innerHTML = distHTML();
   return new Promise(resolve => {
