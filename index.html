@@ -797,7 +797,7 @@ function renderStep(){
   if (s === 'name') return '<div class="card">' + head(0, 'What is your full name?', 'Use the name exactly as it appears on your official documents.') +
     '<div class="field"><label for="f_name">Full name</label><input type="text" id="f_name" value="' + esc(d.fullName) + '" placeholder="e.g. Ahmed Raza Khan" autocomplete="name"></div>' + navHTML() + '</div>';
 
-  if (s === 'location') return '<div class="card">' + head(1, 'Where do you currently live?', 'Select your city and residential area so we can estimate your daily commute to our office in DHA Phase 1, Rawalpindi.') +
+  if (s === 'location') return '<div class="card">' + head(1, 'Where do you currently live?', 'Select your city and residential area.') +
     '<div class="field"><label>City</label>' + comboHTML('city', 'Search your city', d.city) + '</div>' +
     '<div class="field"><label>Residential area</label>' + comboHTML('area', d.city ? 'Search your area' : 'Select a city first', d.area) + '</div>' +
     '<div id="distBox">' + distHTML() + '</div>' + navHTML() + '</div>';
@@ -806,18 +806,18 @@ function renderStep(){
     '<div class="opts">' + boot.education.map(o => optHTML('edu', o, d.education === o)).join('') + '</div>' + navHTML() + '</div>';
 
   if (s === 'organization') return '<div class="card">' + head(3, 'Which organization did you last work for?', 'Enter the name of the company or organization you worked for most recently.') +
-    '<div class="field"><label for="f_org">Organization</label><input type="text" id="f_org" value="' + esc(d.previousOrganization) + '" placeholder="e.g. Acme Solutions" autocomplete="organization"></div>' + navHTML() + '</div>';
+    '<div class="field"><label for="f_org">Organization</label><input type="text" id="f_org" value="' + esc(d.previousOrganization) + '" placeholder="e.g. Your Last Employer Name" autocomplete="organization"></div>' + navHTML() + '</div>';
 
   if (s === 'experience') {
     const years = ['0','1','2','3','4','5','6','7','8','9','10','10+'];
-    return '<div class="card">' + head(4, 'How long have you been working professionally?', 'Count your total professional experience, including your current role.') +
+    return '<div class="card">' + head(4, 'How long have you been working professionally?', 'Count your total professional experience in US Campaigns, including your current role.') +
       '<div class="field"><label>Years</label><select id="f_years">' + years.map(y => '<option value="' + y + '"' + (d.experienceYears === y ? ' selected' : '') + '>' + (y === '10+' ? 'More than 10' : y) + '</option>').join('') + '</select></div>' +
       '<div class="field"><label>Months</label><select id="f_months">' + Array.from({length:11}, (_, i) => i).map(m => '<option value="' + m + '"' + (String(d.experienceMonths) === String(m) ? ' selected' : '') + '>' + m + '</option>').join('') + '</select></div>' + navHTML() + '</div>';
   }
 
-  if (s === 'employment') return '<div class="card">' + head(5, 'Are you currently employed?', 'If you are employed, you can pick one of the next two Tuesday training batches.') +
-    '<div class="opts"><button class="opt ' + (d.employmentStatus === 'Yes' ? 'sel' : '') + '" data-emp="Yes"><span class="dot"></span><span>Yes, I am employed<small>You can choose either of the next two batches</small></span></button>' +
-    '<button class="opt ' + (d.employmentStatus === 'No' ? 'sel' : '') + '" data-emp="No"><span class="dot"></span><span>No, I am not employed<small>You can start at short notice</small></span></button></div>' +
+  if (s === 'employment') return '<div class="card">' + head(5, 'Are you currently employed?', 'This helps us decide the training batch to put you in if you get selected.') +
+    '<div class="opts"><button class="opt ' + (d.employmentStatus === 'Yes' ? 'sel' : '') + '" data-emp="Yes"><span class="dot"></span><span>Yes, I am employed</span></button>' +
+    '<button class="opt ' + (d.employmentStatus === 'No' ? 'sel' : '') + '" data-emp="No"><span class="dot"></span><span>No, I am not employed</span></button></div>' +
     '<div id="batchBox" style="margin-top:18px">' + batchHTML() + '</div>' + navHTML() + '</div>';
 
   if (s === 'campaigns') {
@@ -833,11 +833,11 @@ function renderStep(){
   if (s === 'gender') return '<div class="card">' + head(8, 'What is your gender?', 'This is for our records only and never affects your application.') +
     '<div class="opts">' + boot.genders.map(g => optHTML('gender', g, d.gender === g)).join('') + '</div>' + navHTML() + '</div>';
 
-  if (s === 'accent') return '<div class="card">' + head(9, 'How would you rate your American English accent?', 'Be honest — this helps us prepare the right assessment for you.') +
+  if (s === 'accent') return '<div class="card">' + head(9, 'How would you rate your American English accent?', 'Be honest — this helps us assess your communication skills, accent, and body language.') +
     '<div class="opts">' + boot.accents.map(a => optHTML('accent', a, d.accentProficiency === a)).join('') + '</div>' + navHTML() + '</div>';
 
-  if (s === 'audio') return '<div class="card">' + head(10, 'Spoken English assessment', 'Read the pitch below aloud, then record yourself delivering it as the BDE. Speak naturally, as you would on a real call.') +
-    '<div class="tip"><b>Tip:</b> speak clearly at a steady pace in an American accent. Speaking clearly and confidently can improve your acceptance rate.</div>' +
+  if (s === 'audio') return '<div class="card">' + head(10, 'Voice assessment', 'Read the pitch below aloud. Speak naturally, as you would on a real call.') +
+    '<div class="tip"><b>Tip:</b>Speaking clearly and confidently in an American accent can improve your acceptance rate.</div>' +
     '<div class="script" style="margin-top:14px">' + SCRIPT_HTML + '</div>' +
     '<div id="audioStatus" style="margin-top:18px">' + audioStatusHTML() + '</div>' + navHTML() + '</div>';
 
@@ -850,7 +850,7 @@ function renderStep(){
       return '<button class="opt ' + (d.acknowledgments[k] ? 'sel' : '') + '" data-ack="' + k + '"><span class="chk"></span><span>' + esc(t) + '</span></button>';
     }).join('') + '</div>' + navHTML() + '</div>';
 
-  if (s === 'contact') return '<div class="card">' + head(13, 'How can we reach you?', 'We will use these details for your interview invitation and status updates.') +
+  if (s === 'contact') return '<div class="card">' + head(13, 'How can we reach you?', 'We will use these details to reach you out if you are shortlisted.') +
     '<div class="field"><label for="f_whatsapp">WhatsApp number</label><input type="tel" id="f_whatsapp" value="' + esc(d.whatsapp) + '" placeholder="0300 1234567" inputmode="tel"></div>' +
     '<div class="field"><label for="f_email">Email address</label><input type="email" id="f_email" value="' + esc(d.email) + '" placeholder="you@example.com" inputmode="email"></div>' + navHTML() + '</div>';
 
@@ -878,8 +878,8 @@ function batchHTML(){
   if (d.employmentStatus === 'No') return '';
   return '<label style="display:block;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:#a49b83;margin-bottom:10px;font-family:Poppins,sans-serif">Preferred training batch</label><div class="opts">' +
     list.map(b => '<button class="opt ' + (d.trainingBatch === b.date ? 'sel' : '') + '" data-batch="' + b.date + '"><span class="dot"></span><span>' + esc(b.label) +
-      '<small>Sessions start ' + esc(b.startTime || '07:00') + ' PKT</small></span></button>').join('') + '</div>' +
-    '<div class="tip" style="margin-top:14px">Training runs <b>daily for approximately 1 hour 30 minutes, starting 07:00 PKT</b>. Your selection is a <b>preference only</b> — it does not confirm employment. Our training team confirms your batch after review.</div>';
+      '<small>Sessions start ' + esc(b.startTime || '07:00') + ' PM</small></span></button>').join('') + '</div>' +
+    '<div class="tip" style="margin-top:14px">Training runs <b>daily for approximately 1 hour 30 minutes, starting 07:00 PM</b>. Your selection is a <b>preference only</b> — it does not confirm employment.</div>';
 }
 function campOptsHTML(){
   const d = state.data, q = (d._campQuery || '').toLowerCase();
@@ -1084,7 +1084,7 @@ async function advance(btn){
   if (s === 'contact') {
     d.whatsapp = ($('f_whatsapp').value || '').trim();
     d.email = ($('f_email').value || '').trim();
-    if (!/^(?:\+?92|0)?3\d{9}$/.test(d.whatsapp.replace(/[\s-]/g, ''))) return showErr('Enter a valid Pakistani mobile number, e.g. 0300 1234567.');
+    if (!/^(?:\+?92|0)?3\d{9}$/.test(d.whatsapp.replace(/[\s-]/g, ''))) return showErr('Enter a valid mobile number, e.g. 0300 1234567.');
     if (!/^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(d.email)) return showErr('Enter a valid email address.');
   }
 
